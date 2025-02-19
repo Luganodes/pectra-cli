@@ -1,0 +1,72 @@
+[
+  {
+    "type": "function",
+    "name": "batchConsolidation",
+    "inputs": [
+      {
+        "name": "sourcePubkeys",
+        "type": "bytes[]",
+        "internalType": "bytes[]"
+      },
+      { "name": "targetPubkey", "type": "bytes", "internalType": "bytes" }
+    ],
+    "outputs": [],
+    "stateMutability": "payable"
+  },
+  {
+    "type": "function",
+    "name": "batchPartialExit",
+    "inputs": [
+      { "name": "data", "type": "bytes[2][]", "internalType": "bytes[2][]" }
+    ],
+    "outputs": [],
+    "stateMutability": "payable"
+  },
+  {
+    "type": "function",
+    "name": "batchSwitch",
+    "inputs": [
+      { "name": "pubkeys", "type": "bytes[]", "internalType": "bytes[]" }
+    ],
+    "outputs": [],
+    "stateMutability": "payable"
+  },
+  {
+    "type": "error",
+    "name": "BatchConsolidationFailed",
+    "inputs": [
+      { "name": "sender", "type": "address", "internalType": "address" },
+      { "name": "failedPubkey", "type": "bytes", "internalType": "bytes" }
+    ]
+  },
+  {
+    "type": "error",
+    "name": "BatchPartialExitFailed",
+    "inputs": [
+      { "name": "sender", "type": "address", "internalType": "address" },
+      { "name": "failedPubkey", "type": "bytes", "internalType": "bytes" }
+    ]
+  },
+  {
+    "type": "error",
+    "name": "BatchSwitchFailed",
+    "inputs": [
+      { "name": "sender", "type": "address", "internalType": "address" },
+      { "name": "failedPubkey", "type": "bytes", "internalType": "bytes" }
+    ]
+  },
+  {
+    "type": "error",
+    "name": "InvalidAmountLength",
+    "inputs": [
+      { "name": "invalidAmount", "type": "bytes", "internalType": "bytes" }
+    ]
+  },
+  {
+    "type": "error",
+    "name": "InvalidPubkeyLength",
+    "inputs": [
+      { "name": "invalidPubkey", "type": "bytes", "internalType": "bytes" }
+    ]
+  }
+]

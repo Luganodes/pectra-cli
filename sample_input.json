@@ -1,0 +1,28 @@
+{
+  "withdrawalAddressPrivateKey": "",
+  "rpcUrl": "",
+  "pectraBatchContract": "0x1a91dDF19470354708cD302A6AA8892D50b20Ff5",
+  "switch": {
+    "validators": [
+      "856a568c82ab146b959525179fd7af9bc830adb55647c6a355a92586d24048d2d39275b4cf1df0a12f0b1b1ea34e0a94",
+      "a5d39188d1b01bbce7b8a70b5604e9ca3a17bec4e7100a5a889d3627abfc2962d4c925b2481a9f4ddaeadc5cc062c412",
+      "8eae61ba7b3f403517adb8cce8008fb6f2fb904f442a772289a2de904fdde77d2d7856d826d70c958826bb3f190f9d12"
+    ],
+    "amountPerValidator": 1
+  },
+  "consolidate": {
+    "sourceValidators": [
+      "856a568c82ab146b959525179fd7af9bc830adb55647c6a355a92586d24048d2d39275b4cf1df0a12f0b1b1ea34e0a94",
+      "a5d39188d1b01bbce7b8a70b5604e9ca3a17bec4e7100a5a889d3627abfc2962d4c925b2481a9f4ddaeadc5cc062c412"
+    ],
+    "targetValidator": "8eae61ba7b3f403517adb8cce8008fb6f2fb904f442a772289a2de904fdde77d2d7856d826d70c958826bb3f190f9d12",
+    "amountPerValidator": 1
+  },
+  "partialExit": {
+    "validators": {
+      "8cccb5d671dbf0c663a90b95a344c7dda7e04d084068c92ea9a0064bf2ab3e7fe99d260768c4436f6db83d86a790e112": 1000000000000000000,
+      "abf19e3615da01ca9b6cc7915fc5074b88ee80f63f1ef5977649082614f89b65c0969918ca30465212c34ca217dae9a7": 1000000000000000000
+    },
+    "amountPerValidator": 1
+  }
+}
