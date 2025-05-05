@@ -37,9 +37,9 @@ type SwitchConfig struct {
 
 // ConsolidateConfig represents the consolidate configuration
 type ConsolidateConfig struct {
-	SourceValidators    []string `json:"sourceValidators"`
-	TargetValidator     string   `json:"targetValidator"`
-	AmountPerValidator  int64    `json:"amountPerValidator"`
+	SourceValidators   []string `json:"sourceValidators"`
+	TargetValidator    string   `json:"targetValidator"`
+	AmountPerValidator int64    `json:"amountPerValidator"`
 }
 
 // PartialExitConfig represents the partial exit configuration
@@ -103,14 +103,14 @@ func main() {
 			color.Red("No validators specified for switch operation")
 			return
 		}
-		
+
 		// Use provided amount or default to 1
 		amountPerValidator := config.Switch.AmountPerValidator
 		if amountPerValidator <= 0 {
 			color.Yellow("Amount per validator is not set, using default value of 1")
 			amountPerValidator = 1
 		}
-		
+
 		batchSwitch(client, privateKey, contractAddress, config.Switch.Validators, amountPerValidator, parsedAbi)
 
 	case "consolidate":
@@ -159,7 +159,7 @@ func main() {
 			})
 		}
 		batchPartialExit(client, contractAddress, partialExits, privateKey, amountPerValidator, parsedAbi)
-	
+
 	case "unset-code":
 		sendTransactionUsingAuthorization(client, privateKey, common.Address{}, nil, nil)
 
@@ -202,9 +202,9 @@ func batchSwitch(client *ethclient.Client, privateKey *ecdsa.PrivateKey, contrac
 
 	value := new(big.Int)
 	value.Mul(big.NewInt(int64(len(validators))), big.NewInt(amountPerValidator))
-	color.Cyan("Sending transaction with value: %v (for %d validators at %d each)\n", 
+	color.Cyan("Sending transaction with value: %v (for %d validators at %d each)\n",
 		value, len(validators), amountPerValidator)
-	
+
 	sendTransactionUsingAuthorization(client, privateKey, contract, data, uint256.NewInt(uint64(value.Int64())))
 }
 
@@ -220,12 +220,12 @@ func batchConsolidate(client *ethclient.Client, privateKey *ecdsa.PrivateKey, co
 		color.Red("Failed to pack the data: %v\n", err)
 		return
 	}
-	
+
 	value := new(big.Int)
 	value.Mul(big.NewInt(int64(len(pubkeys))), big.NewInt(amountPerValidator))
-	color.Cyan("Sending transaction with value: %v (for %d validators at %d each)\n", 
+	color.Cyan("Sending transaction with value: %v (for %d validators at %d each)\n",
 		value, len(pubkeys), amountPerValidator)
-	
+
 	sendTransactionUsingAuthorization(client, privateKey, contract, data, uint256.NewInt(uint64(value.Int64())))
 }
 
@@ -237,7 +237,7 @@ func batchPartialExit(client *ethclient.Client, contract common.Address, validat
 		pubkeys = append(pubkeys, [][]byte{common.FromHex(validator.Pubkey), common.FromHex(paddedAmount)})
 	}
 
-	data, err := parsedAbi.Pack("batchPartialExit", pubkeys)
+	data, err := parsedAbi.Pack("batchELExit", pubkeys)
 	if err != nil {
 		color.Red("Failed to pack the data: %v\n", err)
 		return
@@ -245,10 +245,12 @@ func batchPartialExit(client *ethclient.Client, contract common.Address, validat
 
 	value := new(big.Int)
 	value.Mul(big.NewInt(int64(len(validators))), big.NewInt(amountPerValidator))
-	color.Cyan("Sending transaction with value: %v (for %d validators at %d each)\n", 
+	color.Cyan("Sending transaction with value: %v (for %d validators at %d each)\n",
 		value, len(validators), amountPerValidator)
-	
+
 	sendTransactionUsingAuthorization(client, privateKey, contract, data, uint256.NewInt(uint64(value.Int64())))
+	// sendTransactionUsingAuthorization(client, privateKey, contract, data, uint256.NewInt(9))
+
 }
 
 func sendTransactionUsingAuthorization(client *ethclient.Client, privateKey *ecdsa.PrivateKey, contract common.Address, data []byte, value *uint256.Int) {
@@ -310,7 +312,7 @@ func sendTransactionUsingAuthorization(client *ethclient.Client, privateKey *ecd
 		return
 	}
 
-	color.Cyan("Transaction sent: https://explorer.mekong.ethpandaops.io/tx/%s\n", tx.Hash().Hex())
+	color.Cyan("Transaction sent: https://hoodi.etherscan.io/tx/%s\n", tx.Hash().Hex())
 	receipt, err := bind.WaitMined(context.Background(), client, tx)
 	if err != nil {
 		color.Red("Failed to wait for the transaction to be mined: %v\n", err)

@@ -15,7 +15,7 @@
   },
   {
     "type": "function",
-    "name": "batchPartialExit",
+    "name": "batchELExit",
     "inputs": [
       { "name": "data", "type": "bytes[2][]", "internalType": "bytes[2][]" }
     ],
@@ -32,41 +32,90 @@
     "stateMutability": "payable"
   },
   {
-    "type": "error",
-    "name": "BatchConsolidationFailed",
+    "type": "event",
+    "name": "ConsolidationFailed",
     "inputs": [
-      { "name": "sender", "type": "address", "internalType": "address" },
-      { "name": "failedPubkey", "type": "bytes", "internalType": "bytes" }
-    ]
+      {
+        "name": "message",
+        "type": "string",
+        "indexed": false,
+        "internalType": "string"
+      },
+      {
+        "name": "sender",
+        "type": "address",
+        "indexed": false,
+        "internalType": "address"
+      },
+      {
+        "name": "failedPubkey",
+        "type": "bytes",
+        "indexed": false,
+        "internalType": "bytes"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "ExecutionLayerExitFailed",
+    "inputs": [
+      {
+        "name": "message",
+        "type": "string",
+        "indexed": false,
+        "internalType": "string"
+      },
+      {
+        "name": "sender",
+        "type": "address",
+        "indexed": false,
+        "internalType": "address"
+      },
+      {
+        "name": "failedPubkey",
+        "type": "bytes",
+        "indexed": false,
+        "internalType": "bytes"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "SwitchFailed",
+    "inputs": [
+      {
+        "name": "message",
+        "type": "string",
+        "indexed": false,
+        "internalType": "string"
+      },
+      {
+        "name": "sender",
+        "type": "address",
+        "indexed": false,
+        "internalType": "address"
+      },
+      {
+        "name": "failedPubkey",
+        "type": "bytes",
+        "indexed": false,
+        "internalType": "bytes"
+      }
+    ],
+    "anonymous": false
   },
   {
     "type": "error",
-    "name": "BatchPartialExitFailed",
+    "name": "InvalidTargetPubkeyLength",
     "inputs": [
-      { "name": "sender", "type": "address", "internalType": "address" },
-      { "name": "failedPubkey", "type": "bytes", "internalType": "bytes" }
+      {
+        "name": "invalidTargetPubkey",
+        "type": "bytes",
+        "internalType": "bytes"
+      }
     ]
   },
-  {
-    "type": "error",
-    "name": "BatchSwitchFailed",
-    "inputs": [
-      { "name": "sender", "type": "address", "internalType": "address" },
-      { "name": "failedPubkey", "type": "bytes", "internalType": "bytes" }
-    ]
-  },
-  {
-    "type": "error",
-    "name": "InvalidAmountLength",
-    "inputs": [
-      { "name": "invalidAmount", "type": "bytes", "internalType": "bytes" }
-    ]
-  },
-  {
-    "type": "error",
-    "name": "InvalidPubkeyLength",
-    "inputs": [
-      { "name": "invalidPubkey", "type": "bytes", "internalType": "bytes" }
-    ]
-  }
+  { "type": "error", "name": "ReentrancyGuardReentrantCall", "inputs": [] }
 ]
