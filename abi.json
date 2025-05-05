@@ -1,4 +1,97 @@
 [
+  { "type": "fallback", "stateMutability": "payable" },
+  { "type": "receive", "stateMutability": "payable" },
+  {
+    "type": "function",
+    "name": "AMOUNT_EXCEEDS_MAXIMUM",
+    "inputs": [],
+    "outputs": [{ "name": "", "type": "uint8", "internalType": "uint8" }],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "AMOUNT_LENGTH",
+    "inputs": [],
+    "outputs": [{ "name": "", "type": "uint256", "internalType": "uint256" }],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "FULL_EXIT_NOT_CONFIRMED",
+    "inputs": [],
+    "outputs": [{ "name": "", "type": "uint8", "internalType": "uint8" }],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "INVALID_AMOUNT_LENGTH",
+    "inputs": [],
+    "outputs": [{ "name": "", "type": "uint8", "internalType": "uint8" }],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "INVALID_AMOUNT_VALUE",
+    "inputs": [],
+    "outputs": [{ "name": "", "type": "uint8", "internalType": "uint8" }],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "INVALID_PUBKEY_LENGTH",
+    "inputs": [],
+    "outputs": [{ "name": "", "type": "uint8", "internalType": "uint8" }],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "MAX_SOURCE_VALIDATORS",
+    "inputs": [],
+    "outputs": [{ "name": "", "type": "uint256", "internalType": "uint256" }],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "MAX_VALIDATORS",
+    "inputs": [],
+    "outputs": [{ "name": "", "type": "uint256", "internalType": "uint256" }],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "MAX_WITHDRAWAL_AMOUNT",
+    "inputs": [],
+    "outputs": [{ "name": "", "type": "uint64", "internalType": "uint64" }],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "MIN_FEE",
+    "inputs": [],
+    "outputs": [{ "name": "", "type": "uint256", "internalType": "uint256" }],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "MIN_VALIDATORS",
+    "inputs": [],
+    "outputs": [{ "name": "", "type": "uint256", "internalType": "uint256" }],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "OPERATION_FAILED",
+    "inputs": [],
+    "outputs": [{ "name": "", "type": "uint8", "internalType": "uint8" }],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "VALIDATOR_PUBKEY_LENGTH",
+    "inputs": [],
+    "outputs": [{ "name": "", "type": "uint256", "internalType": "uint256" }],
+    "stateMutability": "view"
+  },
   {
     "type": "function",
     "name": "batchConsolidation",
@@ -17,7 +110,7 @@
     "type": "function",
     "name": "batchELExit",
     "inputs": [
-      { "name": "data", "type": "bytes[2][]", "internalType": "bytes[2][]" }
+      { "name": "data", "type": "bytes[3][]", "internalType": "bytes[3][]" }
     ],
     "outputs": [],
     "stateMutability": "payable"
@@ -32,23 +125,86 @@
     "stateMutability": "payable"
   },
   {
+    "type": "function",
+    "name": "consolidationTarget",
+    "inputs": [],
+    "outputs": [{ "name": "", "type": "address", "internalType": "address" }],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "exitTarget",
+    "inputs": [],
+    "outputs": [{ "name": "", "type": "address", "internalType": "address" }],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "getFee",
+    "inputs": [
+      { "name": "target", "type": "address", "internalType": "address" }
+    ],
+    "outputs": [
+      { "name": "fee", "type": "uint256", "internalType": "uint256" }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "onERC1155BatchReceived",
+    "inputs": [
+      { "name": "", "type": "address", "internalType": "address" },
+      { "name": "", "type": "address", "internalType": "address" },
+      { "name": "", "type": "uint256[]", "internalType": "uint256[]" },
+      { "name": "", "type": "uint256[]", "internalType": "uint256[]" },
+      { "name": "", "type": "bytes", "internalType": "bytes" }
+    ],
+    "outputs": [{ "name": "", "type": "bytes4", "internalType": "bytes4" }],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "onERC1155Received",
+    "inputs": [
+      { "name": "", "type": "address", "internalType": "address" },
+      { "name": "", "type": "address", "internalType": "address" },
+      { "name": "", "type": "uint256", "internalType": "uint256" },
+      { "name": "", "type": "uint256", "internalType": "uint256" },
+      { "name": "", "type": "bytes", "internalType": "bytes" }
+    ],
+    "outputs": [{ "name": "", "type": "bytes4", "internalType": "bytes4" }],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "onERC721Received",
+    "inputs": [
+      { "name": "", "type": "address", "internalType": "address" },
+      { "name": "", "type": "address", "internalType": "address" },
+      { "name": "", "type": "uint256", "internalType": "uint256" },
+      { "name": "", "type": "bytes", "internalType": "bytes" }
+    ],
+    "outputs": [{ "name": "", "type": "bytes4", "internalType": "bytes4" }],
+    "stateMutability": "pure"
+  },
+  {
     "type": "event",
     "name": "ConsolidationFailed",
     "inputs": [
       {
-        "name": "message",
-        "type": "string",
+        "name": "reasonCode",
+        "type": "uint8",
         "indexed": false,
-        "internalType": "string"
+        "internalType": "uint8"
       },
       {
-        "name": "sender",
-        "type": "address",
+        "name": "sourcePubkey",
+        "type": "bytes",
         "indexed": false,
-        "internalType": "address"
+        "internalType": "bytes"
       },
       {
-        "name": "failedPubkey",
+        "name": "targetPubkey",
         "type": "bytes",
         "indexed": false,
         "internalType": "bytes"
@@ -61,19 +217,19 @@
     "name": "ExecutionLayerExitFailed",
     "inputs": [
       {
-        "name": "message",
-        "type": "string",
+        "name": "reasonCode",
+        "type": "uint8",
         "indexed": false,
-        "internalType": "string"
+        "internalType": "uint8"
       },
       {
-        "name": "sender",
-        "type": "address",
+        "name": "pubkey",
+        "type": "bytes",
         "indexed": false,
-        "internalType": "address"
+        "internalType": "bytes"
       },
       {
-        "name": "failedPubkey",
+        "name": "amount",
         "type": "bytes",
         "indexed": false,
         "internalType": "bytes"
@@ -86,19 +242,13 @@
     "name": "SwitchFailed",
     "inputs": [
       {
-        "name": "message",
-        "type": "string",
+        "name": "reasonCode",
+        "type": "uint8",
         "indexed": false,
-        "internalType": "string"
+        "internalType": "uint8"
       },
       {
-        "name": "sender",
-        "type": "address",
-        "indexed": false,
-        "internalType": "address"
-      },
-      {
-        "name": "failedPubkey",
+        "name": "pubkey",
         "type": "bytes",
         "indexed": false,
         "internalType": "bytes"
@@ -106,6 +256,7 @@
     ],
     "anonymous": false
   },
+  { "type": "error", "name": "InsufficientFeePerValidator", "inputs": [] },
   {
     "type": "error",
     "name": "InvalidTargetPubkeyLength",
@@ -117,5 +268,8 @@
       }
     ]
   },
-  { "type": "error", "name": "ReentrancyGuardReentrantCall", "inputs": [] }
+  { "type": "error", "name": "MinimumValidatorRequired", "inputs": [] },
+  { "type": "error", "name": "TooManySourceValidators", "inputs": [] },
+  { "type": "error", "name": "TooManyValidators", "inputs": [] },
+  { "type": "error", "name": "Unauthorized", "inputs": [] }
 ]

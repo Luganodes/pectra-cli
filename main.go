@@ -44,14 +44,21 @@ type ConsolidateConfig struct {
 
 // PartialExitConfig represents the partial exit configuration
 type PartialExitConfig struct {
-	Validators         map[string]float64 `json:"validators"`
-	AmountPerValidator int64              `json:"amountPerValidator"`
+	Validators         map[string]PartialExitDetails `json:"validators"`
+	AmountPerValidator int64                         `json:"amountPerValidator"`
 }
 
-// PartialExitData represents a validator and its exit amount
+// PartialExitDetails represents a validator's exit details
+type PartialExitDetails struct {
+	Amount            float64 `json:"amount"`
+	ConfirmFullExit   bool    `json:"confirmFullExit"`   // New field to confirm full exit when amount is 0
+}
+
+// PartialExitData represents a validator and its exit data
 type PartialExitData struct {
-	Pubkey string
-	Amount *big.Int
+	Pubkey          string
+	Amount          *big.Int
+	ConfirmFullExit bool
 }
 
 func main() {
@@ -139,7 +146,7 @@ func main() {
 			return
 		}
 
-		// Use provided amount or default to 11
+		// Use provided amount or default to 1
 		amountPerValidator := config.PartialExit.AmountPerValidator
 		if amountPerValidator <= 0 {
 			color.Yellow("Amount per validator is not set, using default value of 1")
@@ -147,15 +154,20 @@ func main() {
 		}
 
 		partialExits := []PartialExitData{}
-		for pubkey, amountFloat := range config.PartialExit.Validators {
-			// Convert to Gwei (divide by 10^9)
-			amountGwei := new(big.Int).Div(
-				new(big.Int).SetUint64(uint64(amountFloat)),
-				new(big.Int).SetUint64(1000000000),
-			)
+		for pubkey, details := range config.PartialExit.Validators {
+			// The amount is already in Gwei in the JSON
+			amountGwei := big.NewInt(int64(details.Amount))
+			
+			// If amount is 0, we need the confirmFullExit flag
+			isZeroAmount := details.Amount == 0 || amountGwei.Cmp(big.NewInt(0)) == 0
+			if isZeroAmount && !details.ConfirmFullExit {
+				color.Yellow("Warning: Validator %s has zero amount but confirmFullExit is not set. This exit will fail.", pubkey)
+			}
+			
 			partialExits = append(partialExits, PartialExitData{
-				Pubkey: pubkey,
-				Amount: amountGwei,
+				Pubkey:          pubkey,
+				Amount:          amountGwei,
+				ConfirmFullExit: details.ConfirmFullExit,
 			})
 		}
 		batchPartialExit(client, contractAddress, partialExits, privateKey, amountPerValidator, parsedAbi)
@@ -172,6 +184,14 @@ func main() {
 func printUsage() {
 	color.White("Usage: pectra-cli [switch|consolidate|partial-exit|unset-code] input.json")
 	color.White("Example: pectra-cli switch input.json")
+	color.White("\nFor partial-exit, the config file should include:")
+	color.White(`  "validators": {
+    "0x123...": {
+      "amount": 1000000000,  // Amount in Gwei (1 ETH = 1,000,000,000 Gwei)
+      "confirmFullExit": true
+    }
+  }`)
+	color.White("If amount is 0, confirmFullExit must be true to execute a full exit.")
 }
 
 func loadConfig(path string) (*Config, error) {
@@ -230,14 +250,29 @@ func batchConsolidate(client *ethclient.Client, privateKey *ecdsa.PrivateKey, co
 }
 
 func batchPartialExit(client *ethclient.Client, contract common.Address, validators []PartialExitData, privateKey *ecdsa.PrivateKey, amountPerValidator int64, parsedAbi abi.ABI) {
-	pubkeys := [][][]byte{}
+	// Data structure is now bytes[3][] to include the confirmation flag
+	exitData := [][][]byte{}
+	
 	for _, validator := range validators {
 		hexAmount := validator.Amount.Text(16)
 		paddedAmount := strings.Repeat("0", 16-len(hexAmount)) + hexAmount
-		pubkeys = append(pubkeys, [][]byte{common.FromHex(validator.Pubkey), common.FromHex(paddedAmount)})
+		
+		// Create confirmation flag byte - 0x01 for true, 0x00 for false
+		var confirmFlag byte
+		if validator.ConfirmFullExit {
+			confirmFlag = 0x01
+		} else {
+			confirmFlag = 0x00
+		}
+		
+		exitData = append(exitData, [][]byte{
+			common.FromHex(validator.Pubkey),           // Validator pubkey
+			common.FromHex(paddedAmount),               // Amount
+			[]byte{confirmFlag},                        // Confirmation flag
+		})
 	}
 
-	data, err := parsedAbi.Pack("batchELExit", pubkeys)
+	data, err := parsedAbi.Pack("batchELExit", exitData)
 	if err != nil {
 		color.Red("Failed to pack the data: %v\n", err)
 		return
@@ -249,8 +284,6 @@ func batchPartialExit(client *ethclient.Client, contract common.Address, validat
 		value, len(validators), amountPerValidator)
 
 	sendTransactionUsingAuthorization(client, privateKey, contract, data, uint256.NewInt(uint64(value.Int64())))
-	// sendTransactionUsingAuthorization(client, privateKey, contract, data, uint256.NewInt(9))
-
 }
 
 func sendTransactionUsingAuthorization(client *ethclient.Client, privateKey *ecdsa.PrivateKey, contract common.Address, data []byte, value *uint256.Int) {
