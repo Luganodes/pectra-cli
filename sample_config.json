@@ -1,7 +1,6 @@
 {
-  "withdrawalAddressPrivateKey": "",
-  "rpcUrl": "http://100.107.67.3:8545",
-  "pectraBatchContract": "0x3F6D30c16628c701ef924547Caf11B4d597A1ed9",
+  "rpcUrl": "https://ethereum-hoodi-rpc.publicnode.com",
+  "pectraBatchContract": "0x17a56B62aBb68f5b228A818f87A2Da43Da21D3e1",
   "switch": {
     "validators": [
       "a6d3fb8a04db3d878400ea01e722a36ea656447a07e305f27af5b122e98accdf9b89ab6cf43c1167d11acd609ae1a76e",
@@ -18,10 +17,16 @@
     "targetValidator": "a6d3fb8a04db3d878400ea01e722a36ea656447a07e305f27af5b122e98accdf9b89ab6cf43c1167d11acd609ae1a76e",
     "amountPerValidator": 1
   },
-  "partialExit": {
+  "elExit": {
     "validators": {
-      "a6d3fb8a04db3d878400ea01e722a36ea656447a07e305f27af5b122e98accdf9b89ab6cf43c1167d11acd609ae1a76e": 1000000000000000000,
-      "96eec853e0d9acffd62614dbc4f6a1094e75468406af33f0fca3186ef282b0aa0b8a2455e373ff4627b3de0e7c3c4f75": 0
+      "a6d3fb8a04db3d878400ea01e722a36ea656447a07e305f27af5b122e98accdf9b89ab6cf43c1167d11acd609ae1a76e": {
+        "amount": 1000000000,
+        "confirmFullExit": false
+      },
+      "922bec175d5783b2849dae2f2e057bc475a18f79b638572b4ab9550a258410256d5ff0db7d5ca11f9878dd9389696836": {
+        "amount": 0,
+        "confirmFullExit": true
+      }
     },
     "amountPerValidator": 1
   }
