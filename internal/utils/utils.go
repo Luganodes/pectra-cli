@@ -95,9 +95,9 @@ func PrintUsage() {
 }
 
 // GetFee calls the getFee function on the contract and returns the fee value
-func GetFee(client *ethclient.Client, contractAddress common.Address, targetAddress common.Address, parsedABI abi.ABI) (*big.Int, error) {
+func GetFee(client *ethclient.Client, contractAddress common.Address, parsedABI abi.ABI, functionName string) (*big.Int, error) {
 	// Pack the function call data
-	data, err := parsedABI.Pack("getFee", targetAddress)
+	data, err := parsedABI.Pack(functionName)
 	if err != nil {
 		return nil, fmt.Errorf("failed to pack data for getFee call: %v", err)
 	}
@@ -113,11 +113,10 @@ func GetFee(client *ethclient.Client, contractAddress common.Address, targetAddr
 	if err != nil {
 		return nil, fmt.Errorf("contract call failed: %v", err)
 	}
-	color.Green("Result: %v", result)
 
 	// Unpack the result
 	var fee *big.Int
-	err = parsedABI.UnpackIntoInterface(&fee, "getFee", result)
+	err = parsedABI.UnpackIntoInterface(&fee, functionName, result)
 	if err != nil {
 		return nil, fmt.Errorf("failed to unpack result: %v", err)
 	}

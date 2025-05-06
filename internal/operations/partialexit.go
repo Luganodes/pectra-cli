@@ -3,7 +3,6 @@ package operations
 import (
 	"fmt"
 	"math/big"
-	"strings"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/fatih/color"
@@ -32,61 +31,50 @@ func (op *ELExitOperation) Execute() error {
 		amountPerValidator = 1
 	}
 
-	elExits := []ELExitData{}
+	// Create a slice of ExitData structs to match the contract's expected input
+	exitData := []struct {
+		Pubkey     []byte
+		Amount     uint64
+		IsFullExit bool
+	}{}
+
 	for pubkey, details := range op.Validators {
-		// The amount is already in Gwei in the JSON
-		amountGwei := big.NewInt(int64(details.Amount))
-		
+		// Convert amount to uint64 (contract expects uint64)
+		amountUint64 := uint64(details.Amount)
+
 		// If amount is 0, we need the confirmFullExit flag
-		isZeroAmount := details.Amount == 0 || amountGwei.Cmp(big.NewInt(0)) == 0
+		isZeroAmount := details.Amount == 0
 		if isZeroAmount && !details.ConfirmFullExit {
 			color.Yellow("Warning: Validator %s has zero amount but confirmFullExit is not set. This exit will fail.", pubkey)
 		}
-		
-		elExits = append(elExits, ELExitData{
-			Pubkey:          pubkey,
-			Amount:          amountGwei,
-			ConfirmFullExit: details.ConfirmFullExit,
+
+		exitData = append(exitData, struct {
+			Pubkey     []byte
+			Amount     uint64
+			IsFullExit bool
+		}{
+			Pubkey:     common.FromHex(pubkey),
+			Amount:     amountUint64,
+			IsFullExit: details.ConfirmFullExit,
 		})
 	}
 
-	// Data structure is now bytes[3][] to include the confirmation flag
-	exitData := [][][]byte{}
-	
-	for _, validator := range elExits {
-		hexAmount := validator.Amount.Text(16)
-		paddedAmount := strings.Repeat("0", 16-len(hexAmount)) + hexAmount
-		
-		// Create confirmation flag byte - 0x01 for true, 0x00 for false
-		var confirmFlag byte
-		if validator.ConfirmFullExit {
-			confirmFlag = 0x01
-		} else {
-			confirmFlag = 0x00
-		}
-		
-		exitData = append(exitData, [][]byte{
-			common.FromHex(validator.Pubkey),           // Validator pubkey
-			common.FromHex(paddedAmount),               // Amount
-			[]byte{confirmFlag},                        // Confirmation flag
-		})
-	}
-
+	// Pack the data for the contract call
 	data, err := op.ABI.Pack("batchELExit", exitData)
 	if err != nil {
 		return fmt.Errorf("failed to pack the data: %w", err)
 	}
 
 	value := new(big.Int)
-	value.Mul(big.NewInt(int64(len(elExits))), big.NewInt(amountPerValidator))
+	value.Mul(big.NewInt(int64(len(exitData))), big.NewInt(amountPerValidator))
 	color.Cyan("Sending transaction with value: %v (for %d validators at %d each)",
-		value, len(elExits), amountPerValidator)
+		value, len(exitData), amountPerValidator)
 
 	return transaction.SendTransactionUsingAuthorization(
-		op.Client, 
-		op.PrivateKey, 
-		op.ContractAddress, 
-		data, 
+		op.Client,
+		op.PrivateKey,
+		op.ContractAddress,
+		data,
 		uint256.NewInt(uint64(value.Int64())),
 	)
 }

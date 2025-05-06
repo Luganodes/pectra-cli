@@ -63,9 +63,8 @@ func main() {
 	var op operations.Operation
 
 	// Helper function to get fee for a contract
-	getFeeForContract := func(contractAddressHex string) (int64, error) {
-		contractAddr := common.HexToAddress(contractAddressHex)
-		fee, err := utils.GetFee(client, contractAddress, contractAddr, parsedAbi)
+	getFeeForContract := func(functionName string) (int64, error) {
+		fee, err := utils.GetFee(client, contractAddress, parsedAbi, functionName)
 		if err != nil {
 			return 0, err
 		}
@@ -75,7 +74,7 @@ func main() {
 
 	switch command {
 	case "switch":
-		feeAmount, err := getFeeForContract(cfg.ConsolidateContract)
+		feeAmount, err := getFeeForContract("getConsolidationFee")
 		if err != nil {
 			color.Red("Failed to get the fee: %v", err)
 			return
@@ -88,7 +87,7 @@ func main() {
 		}
 
 	case "consolidate":
-		feeAmount, err := getFeeForContract(cfg.ConsolidateContract)
+		feeAmount, err := getFeeForContract("getConsolidationFee")
 		if err != nil {
 			color.Red("Failed to get the fee: %v", err)
 			return
@@ -102,7 +101,7 @@ func main() {
 		}
 
 	case "el-exit":
-		feeAmount, err := getFeeForContract(cfg.ELExitContract)
+		feeAmount, err := getFeeForContract("getExitFee")
 		if err != nil {
 			color.Red("Failed to get the fee: %v", err)
 			return

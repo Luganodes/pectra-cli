@@ -17,8 +17,6 @@ import (
 type Config struct {
 	RPCUrl              string            `json:"rpcUrl"`
 	PectraBatchContract string            `json:"pectraBatchContract"`
-	ConsolidateContract string            `json:"consolidateContract"`
-	ELExitContract      string            `json:"elExitContract"`
 	Switch              SwitchConfig      `json:"switch"`
 	Consolidate         ConsolidateConfig `json:"consolidate"`
 	ELExit              ELExitConfig      `json:"elExit"`
@@ -26,18 +24,18 @@ type Config struct {
 
 // SwitchConfig represents the switch configuration
 type SwitchConfig struct {
-	Validators         []string `json:"validators"`
+	Validators []string `json:"validators"`
 }
 
 // ConsolidateConfig represents the consolidate configuration
 type ConsolidateConfig struct {
-	SourceValidators   []string `json:"sourceValidators"`
-	TargetValidator    string   `json:"targetValidator"`
+	SourceValidators []string `json:"sourceValidators"`
+	TargetValidator  string   `json:"targetValidator"`
 }
 
 // ELExitConfig represents the EL exit configuration
 type ELExitConfig struct {
-	Validators         map[string]ELExitDetails `json:"validators"`
+	Validators map[string]ELExitDetails `json:"validators"`
 }
 
 // elExitDetails represents a validator's exit details
@@ -66,9 +64,6 @@ func LoadConfig(path string) (*Config, error) {
 	if config.PectraBatchContract == "" {
 		return nil, fmt.Errorf("pectraBatchContract is required in the configuration")
 	}
-
-	config.ConsolidateContract = "0x0000BBdDc7CE488642fb579F8B00f3a590007251"
-	config.ELExitContract = "0x00000961Ef480Eb55e80D19ad83579A64c007002"
 
 	return &config, nil
 }
