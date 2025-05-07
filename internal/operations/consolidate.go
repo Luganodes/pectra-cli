@@ -48,10 +48,11 @@ func (op *ConsolidateOperation) Execute() error {
 		value, len(pubkeys), amountPerValidator)
 
 	return transaction.SendTransactionUsingAuthorization(
-		op.Client, 
-		op.PrivateKey, 
-		op.ContractAddress, 
-		data, 
+		op.Client,
+		op.PrivateKey,
+		op.ContractAddress,
+		data,
 		uint256.NewInt(uint64(value.Int64())),
+		op.ExplorerUrl,
 	)
 }

@@ -89,9 +89,9 @@ func PrintUsage() {
 	color.White("  • All amounts are specified in Gwei (1 ETH = 1,000,000,000 Gwei)")
 
 	// Footer
-	color.New(color.FgHiCyan).Println("\n═════════════════════════════════════════════════════════")
-	color.New(color.FgHiCyan).Println("For more information, visit: https://github.com/your-repo/pectra-cli")
-	color.New(color.FgHiCyan).Println("═════════════════════════════════════════════════════════")
+	color.New(color.FgHiCyan).Println("\n═════════════════════════════════════════════════════════════════════")
+	color.New(color.FgHiCyan).Println("For more information, visit: https://github.com/Luganodes/pectra-cli")
+	color.New(color.FgHiCyan).Println("═════════════════════════════════════════════════════════════════════")
 }
 
 // GetFee calls the getFee function on the contract and returns the fee value

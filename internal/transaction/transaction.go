@@ -15,23 +15,23 @@ import (
 )
 
 // SendTransactionUsingAuthorization sends a transaction with authorization
-func SendTransactionUsingAuthorization(client *ethclient.Client, privateKey *ecdsa.PrivateKey, contract common.Address, data []byte, value *uint256.Int) error {
+func SendTransactionUsingAuthorization(client *ethclient.Client, privateKey *ecdsa.PrivateKey, contract common.Address, data []byte, value *uint256.Int, explorerURL string) error {
 	chainID, err := client.NetworkID(context.Background())
 	if err != nil {
 		return fmt.Errorf("failed to get the chain ID: %w", err)
 	}
-	
+
 	fromAddress := crypto.PubkeyToAddress(privateKey.PublicKey)
 	nonce, err := client.PendingNonceAt(context.Background(), fromAddress)
 	if err != nil {
 		return fmt.Errorf("failed to get nonce: %w", err)
 	}
-	
+
 	gasPrice, err := client.SuggestGasPrice(context.Background())
 	if err != nil {
 		return fmt.Errorf("failed to get gas price: %w", err)
 	}
-	
+
 	tipCap, err := client.SuggestGasTipCap(context.Background())
 	if err != nil {
 		return fmt.Errorf("failed to get the gas tip cap: %w", err)
@@ -70,17 +70,17 @@ func SendTransactionUsingAuthorization(client *ethclient.Client, privateKey *ecd
 		return fmt.Errorf("failed to send the transaction: %w", err)
 	}
 
-	color.Cyan("Transaction sent: https://hoodi.etherscan.io/tx/%s", tx.Hash().Hex())
-	
+	color.Cyan("Transaction sent: %s/tx/%s", explorerURL, tx.Hash().Hex())
+
 	receipt, err := bind.WaitMined(context.Background(), client, tx)
 	if err != nil {
 		return fmt.Errorf("failed to wait for the transaction to be mined: %w", err)
 	}
-	
+
 	if receipt.Status != types.ReceiptStatusSuccessful {
 		return fmt.Errorf("transaction failed")
 	}
-	
+
 	color.Green("Transaction successful")
 	return nil
 }

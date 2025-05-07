@@ -28,6 +28,7 @@ type BaseOperation struct {
 	PrivateKey      *ecdsa.PrivateKey
 	ContractAddress common.Address
 	ABI             abi.ABI
+	ExplorerUrl     string
 }
 
 // SendTransaction sends a transaction with the given data and value

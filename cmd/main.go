@@ -58,6 +58,7 @@ func main() {
 		PrivateKey:      privateKey,
 		ContractAddress: contractAddress,
 		ABI:             parsedAbi,
+		ExplorerUrl:     cfg.BlockExplorerUrl,
 	}
 
 	var op operations.Operation
@@ -114,7 +115,7 @@ func main() {
 		}
 
 	case "unset-code":
-		err = transaction.SendTransactionUsingAuthorization(client, privateKey, common.Address{}, nil, nil)
+		err = transaction.SendTransactionUsingAuthorization(client, privateKey, common.Address{}, nil, nil, baseOp.ExplorerUrl)
 		if err != nil {
 			color.Red("Failed to execute unset-code: %v", err)
 		}

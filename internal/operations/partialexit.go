@@ -45,7 +45,11 @@ func (op *ELExitOperation) Execute() error {
 		// If amount is 0, we need the confirmFullExit flag
 		isZeroAmount := details.Amount == 0
 		if isZeroAmount && !details.ConfirmFullExit {
-			color.Yellow("Warning: Validator %s has zero amount but confirmFullExit is not set. This exit will fail.", pubkey)
+			return fmt.Errorf(color.RedString("validator %s has zero amount but confirmFullExit is not set. This exit will fail"), pubkey)
+		}
+
+		if !isZeroAmount && details.ConfirmFullExit {
+			return fmt.Errorf(color.RedString("validator %s doesn't have a zero amount but confirmFullExit is set. This exit will fail"), pubkey)
 		}
 
 		exitData = append(exitData, struct {
@@ -76,5 +80,6 @@ func (op *ELExitOperation) Execute() error {
 		op.ContractAddress,
 		data,
 		uint256.NewInt(uint64(value.Int64())),
+		op.ExplorerUrl,
 	)
 }

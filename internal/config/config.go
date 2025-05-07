@@ -16,6 +16,7 @@ import (
 // Config represents the JSON input file structure
 type Config struct {
 	RPCUrl              string            `json:"rpcUrl"`
+	BlockExplorerUrl    string            `json:"blockExplorerUrl"`
 	PectraBatchContract string            `json:"pectraBatchContract"`
 	Switch              SwitchConfig      `json:"switch"`
 	Consolidate         ConsolidateConfig `json:"consolidate"`
