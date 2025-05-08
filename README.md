@@ -85,6 +85,16 @@ For security, your withdrawal address private key is **not** stored in the `conf
 The CLI requires the Pectra batch contract's ABI. Place the `abi.json` file in the same directory as the `pectra-cli` executable.
 (The ABI is loaded from `./abi.json` as seen in `cmd/main.go` line 49)
 
+## Unset Delegation
+
+> It is HIGHLY recommended to unset delegation after performing any operation. This helps with restoration of EOA functionality and prevents the address from being used as a smart contract.
+
+To unset delegation for a validator, run:
+```bash
+./pectra-cli unset-delegation config.json
+```
+
+
 ## 🛠️ Usage
 
 The general command structure is:
