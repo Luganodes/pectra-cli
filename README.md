@@ -1,6 +1,6 @@
 # Pectra CLI Validators Tool
 
-A command-line interface (CLI) to streamline Ethereum validator operations such as batch switching of withdrawal credentials, consolidating validators, and performing execution layer (EL) exits (both partial and full).
+CLI which can trigger Ethereum validator operations such as consolidations, switching and withdrawals (both partial and full) whilst leveraging EIP 7702 to batch transactions.
 
 ## ✨ Features
 
@@ -85,7 +85,7 @@ For security, your withdrawal address private key is **not** stored in the `conf
 The CLI requires the Pectra batch contract's ABI. Place the `abi.json` file in the same directory as the `pectra-cli` executable.
 (The ABI is loaded from `./abi.json` as seen in `cmd/main.go` line 49)
 
-## Unset Delegation
+## ⚠️ Unset Delegation
 
 > It is HIGHLY recommended to unset delegation after performing any operation. This helps with restoration of EOA functionality and prevents the address from being used as a smart contract.
 

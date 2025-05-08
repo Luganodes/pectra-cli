@@ -42,14 +42,13 @@ func PrintUsage() {
 
 	// Configuration details
 	color.New(color.FgHiWhite, color.Bold).Println("\n⚙️  CONFIGURATION FORMAT:")
-	color.White("  The config file should be a JSON file with the following structure:")
+	color.White("  The config file should be a JSON file with the following structure: (See `sample_config.json` for reference)")
 
 	// Switch config
 	color.New(color.FgYellow).Println("\n  Switch Operation:")
 	color.White(`  {
     "switch": {
-      "validators": ["Validator1", "Validator2", ...],
-      "amountPerValidator": 1
+      "validators": ["Validator1", "Validator2", ...]
     }
   }`)
 
@@ -58,8 +57,7 @@ func PrintUsage() {
 	color.White(`  {
     "consolidate": {
       "sourceValidators": ["SourceValidator1", "SourceValidator2", ...],
-      "targetValidator": "TargetValidator",
-      "amountPerValidator": 1
+      "targetValidator": "TargetValidator"
     }
   }`)
 
@@ -76,14 +74,13 @@ func PrintUsage() {
           "amount": 0,
           "confirmFullExit": true  // Must be true for full exits
         }
-      },
-      "amountPerValidator": 1
+      }
     }
   }`)
 
 	// Notes
 	color.New(color.FgHiWhite, color.Bold).Println("\n📌 NOTES:")
-	color.White("  • Private keys can be provided in the config file or entered securely at runtime")
+	color.White("  • Private keys can be entered securely at runtime")
 	color.White("  • ALl validator addresses must be in hex format, without 0x prefix")
 	color.White("  • To execute a full exit the amount should be 0 & confirmFullExit must be set to true")
 	color.White("  • All amounts are specified in Gwei (1 ETH = 1,000,000,000 Gwei)")
