@@ -3,44 +3,9 @@
   { "type": "receive", "stateMutability": "payable" },
   {
     "type": "function",
-    "name": "AMOUNT_EXCEEDS_MAXIMUM",
-    "inputs": [],
-    "outputs": [{ "name": "", "type": "uint8", "internalType": "uint8" }],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
     "name": "AMOUNT_LENGTH",
     "inputs": [],
     "outputs": [{ "name": "", "type": "uint256", "internalType": "uint256" }],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "FULL_EXIT_NOT_CONFIRMED",
-    "inputs": [],
-    "outputs": [{ "name": "", "type": "uint8", "internalType": "uint8" }],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "INVALID_AMOUNT_LENGTH",
-    "inputs": [],
-    "outputs": [{ "name": "", "type": "uint8", "internalType": "uint8" }],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "INVALID_AMOUNT_VALUE",
-    "inputs": [],
-    "outputs": [{ "name": "", "type": "uint8", "internalType": "uint8" }],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "INVALID_PUBKEY_LENGTH",
-    "inputs": [],
-    "outputs": [{ "name": "", "type": "uint8", "internalType": "uint8" }],
     "stateMutability": "view"
   },
   {
@@ -80,13 +45,6 @@
   },
   {
     "type": "function",
-    "name": "OPERATION_FAILED",
-    "inputs": [],
-    "outputs": [{ "name": "", "type": "uint8", "internalType": "uint8" }],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
     "name": "VALIDATOR_PUBKEY_LENGTH",
     "inputs": [],
     "outputs": [{ "name": "", "type": "uint256", "internalType": "uint256" }],
@@ -110,7 +68,16 @@
     "type": "function",
     "name": "batchELExit",
     "inputs": [
-      { "name": "data", "type": "bytes[3][]", "internalType": "bytes[3][]" }
+      {
+        "name": "data",
+        "type": "tuple[]",
+        "internalType": "struct Pectra.ExitData[]",
+        "components": [
+          { "name": "pubkey", "type": "bytes", "internalType": "bytes" },
+          { "name": "amount", "type": "uint64", "internalType": "uint64" },
+          { "name": "isFullExit", "type": "bool", "internalType": "bool" }
+        ]
+      }
     ],
     "outputs": [],
     "stateMutability": "payable"
@@ -140,10 +107,17 @@
   },
   {
     "type": "function",
-    "name": "getFee",
-    "inputs": [
-      { "name": "target", "type": "address", "internalType": "address" }
+    "name": "getConsolidationFee",
+    "inputs": [],
+    "outputs": [
+      { "name": "fee", "type": "uint256", "internalType": "uint256" }
     ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "getExitFee",
+    "inputs": [],
     "outputs": [
       { "name": "fee", "type": "uint256", "internalType": "uint256" }
     ],
@@ -188,6 +162,15 @@
     "stateMutability": "pure"
   },
   {
+    "type": "function",
+    "name": "supportsInterface",
+    "inputs": [
+      { "name": "interfaceId", "type": "bytes4", "internalType": "bytes4" }
+    ],
+    "outputs": [{ "name": "", "type": "bool", "internalType": "bool" }],
+    "stateMutability": "pure"
+  },
+  {
     "type": "event",
     "name": "ConsolidationFailed",
     "inputs": [
@@ -195,7 +178,7 @@
         "name": "reasonCode",
         "type": "uint8",
         "indexed": false,
-        "internalType": "uint8"
+        "internalType": "enum Pectra.FailureReason"
       },
       {
         "name": "sourcePubkey",
@@ -220,7 +203,7 @@
         "name": "reasonCode",
         "type": "uint8",
         "indexed": false,
-        "internalType": "uint8"
+        "internalType": "enum Pectra.FailureReason"
       },
       {
         "name": "pubkey",
@@ -230,9 +213,9 @@
       },
       {
         "name": "amount",
-        "type": "bytes",
+        "type": "uint64",
         "indexed": false,
-        "internalType": "bytes"
+        "internalType": "uint64"
       }
     ],
     "anonymous": false
@@ -245,7 +228,7 @@
         "name": "reasonCode",
         "type": "uint8",
         "indexed": false,
-        "internalType": "uint8"
+        "internalType": "enum Pectra.FailureReason"
       },
       {
         "name": "pubkey",
