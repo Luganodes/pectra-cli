@@ -46,7 +46,7 @@ func main() {
 	contractAddress := common.HexToAddress(cfg.PectraBatchContract)
 
 	// Load the ABI
-	parsedAbi, err := config.LoadABI("./abi.json")
+	parsedAbi, err := config.LoadABI()
 	if err != nil {
 		color.Red("%v", err)
 		return

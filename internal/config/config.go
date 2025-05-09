@@ -7,11 +7,16 @@ import (
 	"os"
 	"strings"
 
+	_ "embed"
+
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/fatih/color"
 	"golang.org/x/term"
 )
+
+//go:embed abi.json
+var abiFile []byte
 
 // Config represents the JSON input file structure
 type Config struct {
@@ -70,18 +75,12 @@ func LoadConfig(path string) (*Config, error) {
 }
 
 // LoadABI loads the ABI from a file
-func LoadABI(path string) (abi.ABI, error) {
-	abiPath, err := os.ReadFile(path)
+func LoadABI() (abi.ABI, error) {
+	contractABI, err := abi.JSON(strings.NewReader(string(abiFile)))
 	if err != nil {
-		return abi.ABI{}, fmt.Errorf("failed to read the ABI: %w", err)
+		return abi.ABI{}, fmt.Errorf("failed to parse ABI: %v", err)
 	}
-
-	parsedAbi, err := abi.JSON(strings.NewReader(string(abiPath)))
-	if err != nil {
-		return abi.ABI{}, fmt.Errorf("failed to parse the ABI: %w", err)
-	}
-
-	return parsedAbi, nil
+	return contractABI, nil
 }
 
 // GetPrivateKey securely gets the private key from the config or prompts the user
