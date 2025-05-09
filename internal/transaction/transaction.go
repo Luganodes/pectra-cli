@@ -77,8 +77,6 @@ func SendTransactionUsingAuthorization(client *ethclient.Client, privateKey *ecd
 		return fmt.Errorf("failed to wait for the transaction to be mined: %w", err)
 	}
 
-	fmt.Printf("receipt: %+v\n", receipt)
-
 	if receipt.Status != types.ReceiptStatusSuccessful {
 		return fmt.Errorf("transaction failed")
 	}
