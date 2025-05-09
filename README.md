@@ -80,11 +80,11 @@ Create a JSON configuration file named `config.json` in the same directory as th
 *   `blockExplorerUrl` (string): The base URL for your preferred block explorer (e.g., `https://etherscan.io`). Used for displaying transaction links.
 *   `pectraBatchContract` (string): The address of the deployed Pectra batch contract.
 *   `switch.validators` (array of strings): A list of validator public keys (hexadecimal, no "0x" prefix) for the batch switch operation. Maximum source validators for switch: 200 
-*   `consolidate.sourceValidators` (array of strings): A list of source validator public keys for the batch consolidation operation. Maximum validators for consolidation: 63
-*   `consolidate.targetValidator` (string): The target validator public key for consolidation.
+*   `consolidate.sourceValidators` (array of strings): A list of source validator public keys with 0x01 type withdrawal credentials for the batch consolidation operation. Maximum validators for consolidation: 63
+*   `consolidate.targetValidator` (string): The target validator public key for consolidation. Consolidated stake must be less than or equal to 2048 ETH otherwise surplus stake will get automatically sweeped. 
 *   `elExit.validators` (object): A map where keys are validator public keys ( maximum of 200 ) and values are objects containing:
     *   `amount` (number): The amount in **Gwei** to withdraw for a partial exit. For a full exit, set this to `0`.
-    *   `confirmFullExit` (boolean): Must be `true` if `amount` is `0` to confirm a full exit. Otherwise, `false`.
+    *   `confirmFullExit` (boolean): Must be `true` if `amount` is `0` to confirm a full exit. Otherwise, `false` for partial exit and such an `amount` where remaining balance after the exit is at least 32 ETH.
  
 ⚠️ Ensure only required validator addresses are set in config.json and their corresponding private keys are provided via the CLI — missing or incorrect entries may result in unintended transfer of funds. <br><br>
 
