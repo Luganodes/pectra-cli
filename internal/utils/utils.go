@@ -120,3 +120,18 @@ func GetFee(client *ethclient.Client, contractAddress common.Address, parsedABI 
 
 	return fee, nil
 }
+
+// RemoveDuplicateValidators takes a slice of validator strings and returns a new slice
+// containing only unique validators.
+func RemoveDuplicateValidators(validators []string) []string {
+	seen := make(map[string]bool)
+	result := []string{}
+
+	for _, validator := range validators {
+		if _, ok := seen[validator]; !ok {
+			seen[validator] = true
+			result = append(result, validator)
+		}
+	}
+	return result
+}

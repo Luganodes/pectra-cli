@@ -4,10 +4,11 @@ import (
 	"fmt"
 	"math/big"
 
+	"github.com/Luganodes/Pectra-CLI/internal/transaction"
+	"github.com/Luganodes/Pectra-CLI/internal/utils"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/fatih/color"
 	"github.com/holiman/uint256"
-	"github.com/mannan-goyal/0x04/internal/transaction"
 )
 
 // SwitchOperation represents a batch switch operation
@@ -21,6 +22,17 @@ type SwitchOperation struct {
 func (op *SwitchOperation) Execute() error {
 	if len(op.Validators) == 0 {
 		return fmt.Errorf("no validators specified for switch operation")
+	}
+
+	op.Validators = utils.RemoveDuplicateValidators(op.Validators)
+
+	if len(op.Validators) > 200 {
+		return fmt.Errorf("a maximum of 200 validators can be switched at a time")
+	}
+
+	// Validate source validator public keys
+	if err := utils.ValidateValidatorPubkeys(op.Validators); err != nil {
+		return fmt.Errorf("invalid source validator public key: %w", err)
 	}
 
 	// Use provided amount or default to 1

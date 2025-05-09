@@ -4,10 +4,11 @@ import (
 	"fmt"
 	"math/big"
 
+	"github.com/Luganodes/Pectra-CLI/internal/transaction"
+	"github.com/Luganodes/Pectra-CLI/internal/utils"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/fatih/color"
 	"github.com/holiman/uint256"
-	"github.com/mannan-goyal/0x04/internal/transaction"
 )
 
 // ConsolidateOperation represents a batch consolidation operation
@@ -22,6 +23,29 @@ type ConsolidateOperation struct {
 func (op *ConsolidateOperation) Execute() error {
 	if len(op.SourceValidators) == 0 || op.TargetValidator == "" {
 		return fmt.Errorf("source or target validators not specified for consolidate operation")
+	}
+
+	op.SourceValidators = utils.RemoveDuplicateValidators(op.SourceValidators)
+
+	if len(op.SourceValidators) > 63 {
+		return fmt.Errorf("a maximum of 63 validators can be consolidated at a time")
+	}
+
+	// Validate source validator public keys
+	if err := utils.ValidateValidatorPubkeys(op.SourceValidators); err != nil {
+		return fmt.Errorf("invalid source validator public key: %w", err)
+	}
+
+	// Validate target validator public key
+	if err := utils.ValidateValidatorPubkeys([]string{op.TargetValidator}); err != nil {
+		return fmt.Errorf("invalid target validator public key: %w", err)
+	}
+
+	// Check if target validator is in source validators
+	for _, sourceValidator := range op.SourceValidators {
+		if sourceValidator == op.TargetValidator {
+			return fmt.Errorf("target validator (%s) cannot be in the list of source validators", op.TargetValidator)
+		}
 	}
 
 	// Use provided amount or default to 1

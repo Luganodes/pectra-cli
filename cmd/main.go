@@ -3,13 +3,13 @@ package main
 import (
 	"os"
 
+	"github.com/Luganodes/Pectra-CLI/internal/config"
+	"github.com/Luganodes/Pectra-CLI/internal/operations"
+	"github.com/Luganodes/Pectra-CLI/internal/transaction"
+	"github.com/Luganodes/Pectra-CLI/internal/utils"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/fatih/color"
-	"github.com/mannan-goyal/0x04/internal/config"
-	"github.com/mannan-goyal/0x04/internal/operations"
-	"github.com/mannan-goyal/0x04/internal/transaction"
-	"github.com/mannan-goyal/0x04/internal/utils"
 )
 
 func main() {

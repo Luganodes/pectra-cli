@@ -1,4 +1,4 @@
-module github.com/mannan-goyal/0x04
+module github.com/Luganodes/Pectra-CLI
 
 go 1.23.0
 

@@ -4,11 +4,12 @@ import (
 	"fmt"
 	"math/big"
 
+	"github.com/Luganodes/Pectra-CLI/internal/config"
+	"github.com/Luganodes/Pectra-CLI/internal/transaction"
+	"github.com/Luganodes/Pectra-CLI/internal/utils"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/fatih/color"
 	"github.com/holiman/uint256"
-	"github.com/mannan-goyal/0x04/internal/config"
-	"github.com/mannan-goyal/0x04/internal/transaction"
 )
 
 // elExitOperation represents a batch EL exit operation
@@ -22,6 +23,19 @@ type ELExitOperation struct {
 func (op *ELExitOperation) Execute() error {
 	if len(op.Validators) == 0 {
 		return fmt.Errorf("no validators specified for EL exit operation")
+	}
+
+	if len(op.Validators) > 200 {
+		return fmt.Errorf("a maximum of 200 validators can be exited at a time")
+	}
+
+	// Validate public keys
+	pubkeysToValidate := make([]string, 0, len(op.Validators))
+	for pubkey := range op.Validators {
+		pubkeysToValidate = append(pubkeysToValidate, pubkey)
+	}
+	if err := utils.ValidateValidatorPubkeys(pubkeysToValidate); err != nil {
+		return fmt.Errorf("validator public key validation failed: %w", err)
 	}
 
 	// Use provided amount or default to 1
