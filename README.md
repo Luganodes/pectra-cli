@@ -1,14 +1,25 @@
 # Pectra CLI Validators Tool
 
-CLI which can trigger Ethereum validator operations such as consolidations, switching and withdrawals (both partial and full) whilst leveraging EIP 7702 to batch transactions.
+A powerful CLI tool for executing Ethereum validator operations — including consolidation, switching, and both partial and full withdrawals — with seamless batching enabled by EIP-7702.
+
+# Background
+
+The Pectra upgrade (Prague + Electra) introduces key validator enhancements: consolidation allows merging multiple validators into one to simplify management and reduce overhead; switch enables validators to update their BLS keys, supporting strategies like autocompounding without needing to exit and re-enter; and execution layer exits allow validators to  exit directly via the execution layer, streamlining the exit process and enabling better integration with smart contracts and tooling.
+
+This CLI leverages the Pectra.sol smart contract, designed to facilitate batch operations for Ethereum validator management tasks. It leverages EIP-7702 (Set EOA account code) to allow validator withdrawal Externally Owned Accounts (EOAs) to execute multiple operations (consolidation, credential switching, Execution Layer exits) in a single, atomic transaction.
+
+This overcomes the limitation of the official Ethereum Foundation "system assembly" (sys-asm) contracts, which only permit one operation per transaction and require direct initiation by the withdrawal EOA.
 
 ## ✨ Features
 
-*   **Batch Switch**: Update deposit credentials for multiple validators in a single transaction.
-*   **Batch Consolidate**: Consolidate funds from multiple source validators to a single target validator.
+*   **Batch Switch**: Update withdrawal credentials for multiple validators from 0x01 type to 0x02 type in a single transaction.
+*   **Batch Consolidate**: Consolidate funds from multiple source validators to a single target validator in a single transaction.
 *   **Batch EL Exit**: Perform partial or full exits for multiple validators from the execution layer.
 *   **Secure**: Prompts for private key input securely at runtime; it's not stored in configuration files.
 *   **Dynamic Fee Calculation**: Automatically fetches required fees per validator from the smart contract.
+*   **Secure, audited contract**: The Pectra batch contract is open-source and has been independently audited by [Quantstamp](https://quantstamp.com). <br>
+    🔗 [View the contract repository](https://github.com/Luganodes/Pectra-Batch-Contract) <br>
+    🛡️ [Read the full audit report](https://github.com/Luganodes/Pectra-Batch-Contract/blob/main/audits/quantstamp/Audit.pdf)
 
 ## 🚀 Installation
 
@@ -68,22 +79,28 @@ Create a JSON configuration file named `config.json` in the same directory as th
 *   `rpcUrl` (string): The URL of your Ethereum execution client RPC endpoint.
 *   `blockExplorerUrl` (string): The base URL for your preferred block explorer (e.g., `https://etherscan.io`). Used for displaying transaction links.
 *   `pectraBatchContract` (string): The address of the deployed Pectra batch contract.
-*   `switch.validators` (array of strings): A list of validator public keys (hexadecimal, no "0x" prefix) for the batch switch operation.
-*   `consolidate.sourceValidators` (array of strings): A list of source validator public keys for the batch consolidation operation.
+*   `switch.validators` (array of strings): A list of validator public keys (hexadecimal, no "0x" prefix) for the batch switch operation. Maximum source validators for switch: 200 
+*   `consolidate.sourceValidators` (array of strings): A list of source validator public keys for the batch consolidation operation. Maximum validators for consolidation: 63
 *   `consolidate.targetValidator` (string): The target validator public key for consolidation.
-*   `elExit.validators` (object): A map where keys are validator public keys and values are objects containing:
+*   `elExit.validators` (object): A map where keys are validator public keys ( maximum of 200 ) and values are objects containing:
     *   `amount` (number): The amount in **Gwei** to withdraw for a partial exit. For a full exit, set this to `0`.
     *   `confirmFullExit` (boolean): Must be `true` if `amount` is `0` to confirm a full exit. Otherwise, `false`.
+ 
+⚠️ Ensure only required validator addresses are set in config.json and their corresponding private keys are provided via the CLI — missing or incorrect entries may result in unintended transfer of funds. <br><br>
+
 
 ## 🔑 Private Key Handling
 
 For security, your withdrawal address private key is **not** stored in the `config.json` file. The CLI will securely prompt you to enter it at runtime when an operation is initiated.
 (See `internal/config/config.go` lines 88-114)
 
+⚠️ Ensure that correct private keys are provided for the validators — otherwise, transactions will succeed but no validator operation will occur, wasting gas. <br><br>
+
+
 ## 📜 ABI Dependency
 
 The CLI requires the Pectra batch contract's ABI. Place the `abi.json` file in the same directory as the `pectra-cli` executable.
-(The ABI is loaded from `./abi.json` as seen in `cmd/main.go` line 49)
+(The ABI is loaded from `./abi.json` as seen in `cmd/main.go` line 49) <br><br>
 
 ## ⚠️ Unset Delegation
 
@@ -111,30 +128,35 @@ Replace `<command>` with one of the operations listed below and `config.json` wi
 
 ### Switch Validators
 
-Updates deposit credentials for the validators specified in `config.json` under the `switch` section.
+Updates deposit credentials for the validators specified in `config.json` under the `switch` section. You can switch up to 200 validators in a single batch.
 
 ```bash
 ./pectra-cli switch config.json
 ```
+⚠️ Do not switch a validator that has already been switched — the transaction will succeed but the switch won't take effect, wasting gas. <br><br>
 
 
 
 ### Consolidate Validators
 
-Consolidates funds from `sourceValidators` to `targetValidator` as specified in `config.json` under the `consolidate` section.
+Consolidates funds from `sourceValidators` to `targetValidator` as specified in `config.json` under the `consolidate` section. You can consolidate from up to 63 source validators into one target validator. 
 
 ```bash
 ./pectra-cli consolidate config.json
 ```
+⚠️ Do not use exited validators as source or target — transactions will succeed but consolidation won't occur, wasting gas.<br><br>
+
 
 
 ### Execution Layer (EL) Exit
 
-Performs partial or full exits for validators specified in `config.json` under the `elExit` section.
+Performs partial or full exits for validators specified in `config.json` under the `elExit` section. You can exit up to 200 validators in a single batch. 
 
 ```bash
 ./pectra-cli el-exit config.json
 ```
+⚠️ Do not attempt to exit a validator that has already exited — the transaction will succeed but no exit will occur, wasting gas. <br><br>
+
 
 
 ## 📝 Important Notes
@@ -150,12 +172,20 @@ Performs partial or full exits for validators specified in `config.json` under t
 *   **Transaction Authorization**: This tool utilizes EIP-7702 SetCode transaction authorization for its operations.
     (See `internal/transaction/transaction.go` lines 18-61)
 
+<br>
+
 ## 🖼️ Sample Output
 
 (The CLI provides informative output during its execution, including connection status, fees, transaction hashes, and success/failure messages.)
 
-![Sample Output](https://i.imgur.com/niLux60.png)
-*(Note: The sample output image might show older field names or values; refer to the current configuration guidelines.)*
+![Sample Switch Output](https://i.imgur.com/2L4yFsF.png)
+
+![Sample Consolidation Output](https://i.imgur.com/Xk9ZKLI.png)
+
+![Sample Exectuion Layer Exit Output](https://i.imgur.com/jboxLgH.png)
+*(Note: The sample output images might show older field names or values; refer to the current configuration guidelines.)*
+
+<br>
 
 ## 🏗️ Project Structure
 
@@ -169,6 +199,8 @@ The project is organized as follows:
     *   `utils/`: Provides utility functions, including printing usage information and fee fetching.
 *   `abi.json`: The contract ABI (must be present at runtime).
 *   `.github/workflows/`: Contains GitHub Actions workflows for CI/CD, including automated releases.
+
+<br>
 
 ## 🔄 Building and Releasing
 
