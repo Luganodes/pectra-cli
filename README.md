@@ -21,7 +21,8 @@ This overcomes the limitation of the official Ethereum Foundation "system assemb
 - **Dynamic Fee Calculation**: Automatically fetches required fees per validator from the smart contract.
 - **Secure, audited contract**: The Pectra batch contract is open-source and has been independently audited by [Quantstamp](https://quantstamp.com). <br>
   🔗 [View the contract repository](https://github.com/Luganodes/Pectra-Batch-Contract) <br>
-  🛡️ [Read the full audit report](https://github.com/Luganodes/Pectra-Batch-Contract/blob/main/audits/quantstamp/Audit.pdf)
+  🛡️ [Read the full audit report](https://github.com/Luganodes/Pectra-Batch-Contract/blob/main/audits/quantstamp/Audit.pdf) <br>
+  📄 [Audit Certificate](https://certificate.quantstamp.com/full/luganodes-pectra-batch-contract/23f0765f-969a-4798-9edd-188d276c4a2b/index.html)
 
 ## Installation
 
