@@ -1,64 +1,94 @@
-name: Release
-
+name: Build and Release
 on:
   push:
     branches:
       - main
+    tags:
+      - 'v*'
 
 jobs:
-  build-and-release:
+  build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
         with:
           fetch-depth: 0  # Fetch all history for proper versioning
-
+      
       - name: Set up Go
         uses: actions/setup-go@v4
         with:
           go-version: '1.21'
           cache: true
-
+      
       - name: Install dependencies
         run: go mod download
-
+      
       - name: Run linter
         uses: golangci/golangci-lint-action@v3
         with:
           version: latest
-
+      
       - name: Run tests
         run: go test -v ./...
-
+      
       - name: Generate version
         id: version
         run: |
-          VERSION=$(date +'%Y.%m.%d')-$(git rev-parse --short HEAD)
+          if [[ $GITHUB_REF == refs/tags/v* ]]; then
+            # Use the tag name as version if it's a tag push
+            VERSION=${GITHUB_REF#refs/tags/v}
+          else
+            # Generate version based on date and commit hash for non-tag pushes
+            VERSION=$(date +'%Y.%m.%d')-$(git rev-parse --short HEAD)
+          fi
           echo "version=$VERSION" >> $GITHUB_OUTPUT
-
+      
       - name: Build
         run: |
           GOOS=linux GOARCH=amd64 go build -v -ldflags="-X 'main.Version=${{ steps.version.outputs.version }}'" -o pectra-cli-linux-amd64 ./cmd/main.go
           GOOS=darwin GOARCH=amd64 go build -v -ldflags="-X 'main.Version=${{ steps.version.outputs.version }}'" -o pectra-cli-darwin-amd64 ./cmd/main.go
           GOOS=windows GOARCH=amd64 go build -v -ldflags="-X 'main.Version=${{ steps.version.outputs.version }}'" -o pectra-cli-windows-amd64.exe ./cmd/main.go
-
+      
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: binaries
+          path: |
+            pectra-cli-linux-amd64
+            pectra-cli-darwin-amd64
+            pectra-cli-windows-amd64.exe
+  
+  release:
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: binaries
+      
+      - name: Get tag name
+        id: get_tag
+        run: echo "tag=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+      
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: v${{ steps.version.outputs.version }}
-          release_name: Release v${{ steps.version.outputs.version }}
+          tag_name: ${{ steps.get_tag.outputs.tag }}
+          release_name: Release ${{ steps.get_tag.outputs.tag }}
           body: |
-            Release v${{ steps.version.outputs.version }}
+            Release ${{ steps.get_tag.outputs.tag }}
             
             Changes in this release:
             ${{ github.event.head_commit.message }}
           draft: false
           prerelease: false
-
+      
       - name: Upload Linux Binary
         uses: actions/upload-release-asset@v1
         env:
@@ -68,7 +98,7 @@ jobs:
           asset_path: ./pectra-cli-linux-amd64
           asset_name: pectra-cli-linux-amd64
           asset_content_type: application/octet-stream
-
+      
       - name: Upload macOS Binary
         uses: actions/upload-release-asset@v1
         env:
@@ -78,7 +108,7 @@ jobs:
           asset_path: ./pectra-cli-darwin-amd64
           asset_name: pectra-cli-darwin-amd64
           asset_content_type: application/octet-stream
-
+      
       - name: Upload Windows Binary
         uses: actions/upload-release-asset@v1
         env:
