@@ -36,6 +36,10 @@ This overcomes the limitation of the official Ethereum Foundation "system assemb
 
     This will create an executable file named `pectra-cli` in the current directory.
 
+## Deployed Contracts
+- Mainnet - [0x17c11FDdADac2b341F2455aFe988fec4c3ba26e3](https://etherscan.io/address/0x17c11FDdADac2b341F2455aFe988fec4c3ba26e3)
+- Hoodi - [0xe264B0F3e491Ab5aEd2C0A32956cb9e68707F457](https://hoodi.etherscan.io/address/0xe264B0F3e491Ab5aEd2C0A32956cb9e68707F457)
+
 ## Configuration
 
 Create a JSON configuration file named `config.json` in the same directory as the `pectra-cli` executable. You can use `sample_config.json` as a template.
