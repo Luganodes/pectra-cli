@@ -226,3 +226,6 @@ To start contributing, check out [`CONTRIBUTING.md`](./CONTRIBUTING.md) . New co
 ## License
 
 Distributed under the MIT License. See [`LICENSE`](./LICENSE) for more information.
+
+## Disclaimer
+> The information herein is for general informational purposes only and does not constitute legal, business, tax, professional, financial, or investment advice. No warranties are made regarding its accuracy, correctness, completeness, or reliability. Luganodes and its affiliates disclaim all liability for any losses or damages arising from reliance on this information. Luganodes is not obligated to update or amend any content. Use of this at your own risk. For any advice, please consult a qualified professional.
