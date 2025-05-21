@@ -29,6 +29,7 @@ type BaseOperation struct {
 	ContractAddress common.Address
 	ABI             abi.ABI
 	ExplorerUrl     string
+	Airgapped       bool
 }
 
 // SendTransaction sends a transaction with the given data and value

@@ -64,5 +64,6 @@ func (op *SwitchOperation) Execute() error {
 		data,
 		uint256.NewInt(uint64(value.Int64())),
 		op.ExplorerUrl,
+		op.Airgapped,
 	)
 }
