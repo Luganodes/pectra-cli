@@ -98,7 +98,7 @@ Create a JSON configuration file named `config.json` in the same directory as th
 
 ## Private Key Handling
 
-Use the --airgapped flag to export an unsigned transaction to unsigned_txn.json, which can be signed and broadcast using scripts/sign.go; alternatively, omit the flag to sign directly in the CLI by providing the private key. The CLI will securely prompt you to enter it at runtime when an operation is initiated.
+Use the `--airgapped` or `-a` flag to export an unsigned transaction to unsigned_txn.json, which can be signed and broadcasted using `scripts/sign.go`; alternatively, omit the flag to sign directly in the CLI by providing the private key. The CLI will securely prompt you to enter it at runtime when an operation is initiated.
 (See `internal/config/config.go` lines 88-114)
 
 ⚠️ Ensure that correct private keys are provided for the validators — otherwise, transactions will succeed but no validator operation will occur, wasting gas. <br><br>
@@ -185,9 +185,9 @@ Performs partial or full exits for validators specified in `config.json` under t
 
 (The CLI provides informative output during its execution, including connection status, fees, transaction hashes, and success/failure messages.)
 
-![Sample Airgapped Output](https://i.imgur.com/KLJ5FPC.png)
+![Sample Airgapped Output](https://i.imgur.com/CfKpNsN.png)
 
-![Sample Non Airgapped Output](blob:https://imgur.com/49669513-39c6-425a-9438-e22e4db68434)
+![Sample Non Airgapped Output](https://i.imgur.com/L2wpleY.png)
 _(Note: The sample output images might show older field names or values; refer to the current configuration guidelines.)_
 
 <br>
