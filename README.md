@@ -2,7 +2,7 @@
 
 ![banner](https://i.imgur.com/7YKiU9D.png)
 
-A powerful CLI tool for executing Ethereum validator operations including consolidation, switching, and both partial and full withdrawals with seamless batching enabled by EIP-7702.
+A powerful airgapped CLI tool for executing Ethereum validator operations including consolidation, switching, and both partial and full withdrawals with seamless batching enabled by EIP-7702.
 
 # Background
 
@@ -12,12 +12,14 @@ This CLI leverages the Pectra.sol smart contract, designed to facilitate batch o
 
 This overcomes the limitation of the official Ethereum Foundation "system assembly" (sys-asm) contracts, which only permit one operation per transaction and require direct initiation by the withdrawal EOA.
 
+Moreover, the CLI is designed to be airgapped, ensuring security by allowing users to generate unsigned transactions without exposing sensitive keys. These transactions can then be signed externally using the appropriate withdrawal address in a secure, offline environment, and broadcasted manually to the network. This approach supports safe validator operations without compromising key custody.
+
 ## Features
 
 - **Batch Switch**: Update withdrawal credentials for multiple validators from 0x01 type to 0x02 type in a single transaction.
 - **Batch Consolidate**: Consolidate funds from multiple source validators to a single target validator in a single transaction.
 - **Batch EL Exit**: Perform partial or full exits for multiple validators from the execution layer.
-- **Secure**: Prompts for private key input securely at runtime; it's not stored in configuration files.
+- **Secure**: Supports airgapped workflows by generating unsigned transactions that users can sign with their withdrawal address in a secure offline environment.
 - **Dynamic Fee Calculation**: Automatically fetches required fees per validator from the smart contract.
 - **Secure, audited contract**: The Pectra batch contract is open-source and has been independently audited by [Quantstamp](https://quantstamp.com). <br>
   🔗 [View the contract repository](https://github.com/Luganodes/Pectra-Batch-Contract) <br>
@@ -96,7 +98,7 @@ Create a JSON configuration file named `config.json` in the same directory as th
 
 ## Private Key Handling
 
-For security, your withdrawal address private key is **not** stored in the `config.json` file. The CLI will securely prompt you to enter it at runtime when an operation is initiated.
+Use the --airgapped flag to export an unsigned transaction to unsigned_txn.json, which can be signed and broadcast using scripts/sign.go; alternatively, omit the flag to sign directly in the CLI by providing the private key. The CLI will securely prompt you to enter it at runtime when an operation is initiated.
 (See `internal/config/config.go` lines 88-114)
 
 ⚠️ Ensure that correct private keys are provided for the validators — otherwise, transactions will succeed but no validator operation will occur, wasting gas. <br><br>
@@ -113,7 +115,7 @@ The CLI requires the Pectra batch contract's ABI. Place the `abi.json` file in t
 To unset delegation for a validator, run:
 
 ```bash
-./pectra-cli unset-delegation config.json
+./pectra-cli unset-delegation -c config.json
 ```
 
 ## Usage
@@ -121,7 +123,7 @@ To unset delegation for a validator, run:
 The general command structure is:
 
 ```bash
-./pectra-cli <command> config.json
+./pectra-cli <command> -c config.json 
 ```
 
 To get a gist of the CLI, run:
@@ -132,12 +134,14 @@ To get a gist of the CLI, run:
 
 Replace `<command>` with one of the operations listed below and `config.json` with the path to your configuration file.
 
+Add the `--a` flag to run thr CLI in airgapped mode.
+
 ### Switch Validators
 
 Updates deposit credentials for the validators specified in `config.json` under the `switch` section. You can switch up to 200 validators in a single batch.
 
 ```bash
-./pectra-cli switch config.json
+./pectra-cli switch -c config.json
 ```
 
 ⚠️ Do not switch a validator that has already been switched — the transaction will succeed but the switch won't take effect, wasting gas. <br><br>
@@ -147,7 +151,7 @@ Updates deposit credentials for the validators specified in `config.json` under 
 Consolidates funds from `sourceValidators` to `targetValidator` as specified in `config.json` under the `consolidate` section. You can consolidate from up to 63 source validators into one target validator.
 
 ```bash
-./pectra-cli consolidate config.json
+./pectra-cli consolidate -c config.json
 ```
 
 ⚠️ Do not use exited validators as source or target — transactions will succeed but consolidation won't occur, wasting gas.<br><br>
@@ -157,7 +161,7 @@ Consolidates funds from `sourceValidators` to `targetValidator` as specified in 
 Performs partial or full exits for validators specified in `config.json` under the `elExit` section. You can exit up to 200 validators in a single batch.
 
 ```bash
-./pectra-cli el-exit config.json
+./pectra-cli el-exit -c config.json
 ```
 
 ⚠️ Do not attempt to exit a validator that has already exited — the transaction will succeed but no exit will occur, wasting gas. <br><br>
@@ -181,11 +185,9 @@ Performs partial or full exits for validators specified in `config.json` under t
 
 (The CLI provides informative output during its execution, including connection status, fees, transaction hashes, and success/failure messages.)
 
-![Sample Switch Output](https://i.imgur.com/2L4yFsF.png)
+![Sample Airgapped Output](https://i.imgur.com/KLJ5FPC.png)
 
-![Sample Consolidation Output](https://i.imgur.com/Xk9ZKLI.png)
-
-![Sample Exectuion Layer Exit Output](https://i.imgur.com/jboxLgH.png)
+![Sample Non Airgapped Output](blob:https://imgur.com/49669513-39c6-425a-9438-e22e4db68434)
 _(Note: The sample output images might show older field names or values; refer to the current configuration guidelines.)_
 
 <br>
