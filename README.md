@@ -98,7 +98,7 @@ Create a JSON configuration file named `config.json` in the same directory as th
 
 ## Private Key Handling
 
-Use the `--airgapped` or `-a` flag to export an unsigned transaction to unsigned_txn.json, which can be signed and broadcasted using `scripts/sign.go`; alternatively, omit the flag to sign directly in the CLI by providing the private key. The CLI will securely prompt you to enter it at runtime when an operation is initiated.
+Use the `--airgapped` or `-a` to run the CLI in airgapped mode; alternatively, omit the flag to sign directly in the CLI by providing the private key. The CLI will securely prompt you to enter it at runtime when an operation is initiated.
 (See `internal/config/config.go` lines 88-114)
 
 ⚠️ Ensure that correct private keys are provided for the validators — otherwise, transactions will succeed but no validator operation will occur, wasting gas. <br><br>
@@ -134,7 +134,7 @@ To get a gist of the CLI, run:
 
 Replace `<command>` with one of the operations listed below and `config.json` with the path to your configuration file.
 
-Add the `--a` flag to run thr CLI in airgapped mode.
+Add the `-a` or `--airgapped` flag to run the CLI in airgapped mode.
 
 ### Switch Validators
 
@@ -166,6 +166,20 @@ Performs partial or full exits for validators specified in `config.json` under t
 
 ⚠️ Do not attempt to exit a validator that has already exited — the transaction will succeed but no exit will occur, wasting gas. <br><br>
 
+### Signing and Broadcast for airgapped mode
+
+To sign an unsigned transaction, use `scripts/sign.go` on the `unsigned_txn.json` file — this will generate a `signed_txn.json`. 
+
+```bash
+go run scripts/sign.go unsigned_txn.json
+```
+Once signed, use the CLI's broadcast command to submit the `signed_txn.json` to the network.
+
+
+```bash
+./pectra-cli broadcast -c config.json -f signed_txn.json
+```
+
 ## 📝 Important Notes
 
 - **Validator Public Keys**: All validator public keys in the `config.json` file must be in hexadecimal format, without the "0x" prefix.
@@ -184,9 +198,14 @@ Performs partial or full exits for validators specified in `config.json` under t
 ## Sample Output
 
 (The CLI provides informative output during its execution, including connection status, fees, transaction hashes, and success/failure messages.)
-
+### Sample Output for airgapped mode
 ![Sample Airgapped Output](https://i.imgur.com/CfKpNsN.png)
-
+<br>
+![Sample Signing Output](https://i.imgur.com/M9GGQB0.png)
+<br>
+![Sample Broadcast Output](https://i.imgur.com/nIEZDl8.png)
+<br>
+### Sample Output for non-airgapped mode
 ![Sample Non Airgapped Output](https://i.imgur.com/L2wpleY.png)
 _(Note: The sample output images might show older field names or values; refer to the current configuration guidelines.)_
 
