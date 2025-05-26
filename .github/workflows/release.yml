@@ -27,16 +27,28 @@ jobs:
           GOOS: ${{ matrix.goos }}
           GOARCH: ${{ matrix.goarch }}
         run: |
-          BINARY_NAME="pectra-cli"
+          # Build pectra-cli
+          PECTRA_BINARY_NAME="pectra-cli"
           if [ "${{ matrix.goos }}" = "windows" ]; then
-            BINARY_NAME="${BINARY_NAME}.exe"
+            PECTRA_BINARY_NAME="${PECTRA_BINARY_NAME}.exe"
           fi
-          go build -o $BINARY_NAME cmd/main.go
+          go build -o $PECTRA_BINARY_NAME cmd/main.go
+
+          # Build signer
+          SIGNER_BINARY_NAME="signer"
+          if [ "${{ matrix.goos }}" = "windows" ]; then
+            SIGNER_BINARY_NAME="${SIGNER_BINARY_NAME}.exe"
+          fi
+          go build -o $SIGNER_BINARY_NAME scripts/sign.go
+
+          # Create dist directory and move binaries
           mkdir -p dist
           if [ "${{ matrix.goos }}" = "windows" ]; then
-            mv $BINARY_NAME "dist/pectra-cli-${{ matrix.goos }}-${{ matrix.goarch }}.exe"
+            mv $PECTRA_BINARY_NAME "dist/pectra-cli-${{ matrix.goos }}-${{ matrix.goarch }}.exe"
+            mv $SIGNER_BINARY_NAME "dist/signer-${{ matrix.goos }}-${{ matrix.goarch }}.exe"
           else
-            mv $BINARY_NAME "dist/pectra-cli-${{ matrix.goos }}-${{ matrix.goarch }}"
+            mv $PECTRA_BINARY_NAME "dist/pectra-cli-${{ matrix.goos }}-${{ matrix.goarch }}"
+            mv $SIGNER_BINARY_NAME "dist/signer-${{ matrix.goos }}-${{ matrix.goarch }}"
           fi
 
       - name: Create Release
