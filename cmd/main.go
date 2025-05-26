@@ -216,7 +216,7 @@ func runCommand(command, configPath string, airgapped bool) error {
 		if err != nil {
 			return 0, err
 		}
-		color.Green("Fee Amount per Validator: %v", fee)
+		color.Green("Fee Amount per Validator: %v wei", fee)
 		return fee.Int64(), nil
 	}
 
