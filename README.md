@@ -8,7 +8,7 @@ A powerful airgapped CLI tool for executing Ethereum validator operations includ
 
 The Pectra upgrade (Prague + Electra) introduces key validator enhancements: consolidation allows merging multiple validators into one to simplify management and reduce overhead; switch enables validators to update their BLS keys, supporting strategies like autocompounding without needing to exit and re-enter; and execution layer exits allow validators to exit directly via the execution layer, streamlining the exit process and enabling better integration with smart contracts and tooling.
 
-This CLI leverages the Pectra.sol smart contract, designed to facilitate batch operations for Ethereum validator management tasks. It leverages EIP-7702 (Set EOA account code) to allow validator withdrawal Externally Owned Accounts (EOAs) to execute multiple operations (consolidation, credential switching, Execution Layer exits) in a single, atomic transaction.
+This CLI leverages the Pectra.sol smart contract, designed to facilitate batch operations for Ethereum validator management tasks resulting in 60–80% gas savings. It leverages EIP-7702 (Set EOA account code) to allow validator withdrawal Externally Owned Accounts (EOAs) to execute multiple operations (consolidation, credential switching, Execution Layer exits) in a single, atomic transaction.
 
 This overcomes the limitation of the official Ethereum Foundation "system assembly" (sys-asm) contracts, which only permit one operation per transaction and require direct initiation by the withdrawal EOA.
 
