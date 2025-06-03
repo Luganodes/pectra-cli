@@ -2,6 +2,7 @@ package config
 
 import (
 	"crypto/ecdsa"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -10,6 +11,7 @@ import (
 	_ "embed"
 
 	"github.com/ethereum/go-ethereum/accounts/abi"
+	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/fatih/color"
 	"golang.org/x/term"
@@ -84,7 +86,7 @@ func LoadABI() (abi.ABI, error) {
 }
 
 // GetPrivateKey securely gets the private key from the config or prompts the user
-func GetPrivateKey(config *Config) (*ecdsa.PrivateKey, error) {
+func GetPrivateKey() (*ecdsa.PrivateKey, error) {
 	var privateKeyHex string
 
 	// If private key is not in config, prompt for it securely
@@ -110,4 +112,45 @@ func GetPrivateKey(config *Config) (*ecdsa.PrivateKey, error) {
 	}
 
 	return privateKey, nil
+}
+
+// GetPublicKey gets a withdrawal address (EOA) public key from user input
+func GetPublicKey() (string, error) {
+	var publicKeyHex string
+
+	// Prompt user for input
+	color.Cyan("Please enter the withdrawal address (0x... format):")
+	fmt.Print("> ")
+
+	var input string
+	_, err := fmt.Scanln(&input)
+	if err != nil {
+		return "", fmt.Errorf("failed to read address: %w", err)
+	}
+
+	publicKeyHex = strings.TrimSpace(input)
+
+	// Check format
+	if !strings.HasPrefix(publicKeyHex, "0x") {
+		return "", fmt.Errorf("address must start with 0x prefix")
+	}
+
+	// Should be 42 characters (0x + 40 hex chars)
+	if len(publicKeyHex) != 42 {
+		return "", fmt.Errorf("invalid address length: expected 42 characters (20 bytes), got %d", len(publicKeyHex))
+	}
+
+	// Check if it's a valid hex string
+	_, decodeErr := hex.DecodeString(publicKeyHex[2:])
+	if decodeErr != nil {
+		return "", fmt.Errorf("invalid address format: %w", decodeErr)
+	}
+
+	// Validate checksum if it's a mixed-case address
+	if !common.IsHexAddress(publicKeyHex) {
+		return "", fmt.Errorf("invalid Ethereum address")
+	}
+
+	// Return checksum address for consistency
+	return common.HexToAddress(publicKeyHex).Hex(), nil
 }

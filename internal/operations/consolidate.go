@@ -16,7 +16,7 @@ type ConsolidateOperation struct {
 	BaseOperation
 	SourceValidators   []string
 	TargetValidator    string
-	AmountPerValidator int64
+	AmountPerValidator *big.Int
 }
 
 // Execute performs the batch consolidation operation
@@ -50,9 +50,9 @@ func (op *ConsolidateOperation) Execute() error {
 
 	// Use provided amount or default to 1
 	amountPerValidator := op.AmountPerValidator
-	if amountPerValidator <= 0 {
+	if amountPerValidator == nil {
 		color.Yellow("Amount per validator is not set, using default value of 1")
-		amountPerValidator = 1
+		amountPerValidator = big.NewInt(1)
 	}
 
 	pubkeys := [][]byte{}
@@ -67,7 +67,7 @@ func (op *ConsolidateOperation) Execute() error {
 	}
 
 	value := new(big.Int)
-	value.Mul(big.NewInt(int64(len(pubkeys))), big.NewInt(amountPerValidator))
+	value.Mul(big.NewInt(int64(len(pubkeys))), amountPerValidator)
 	color.Cyan("Sending transaction with value: %v (for %d validators at %d each)",
 		value, len(pubkeys), amountPerValidator)
 
@@ -78,5 +78,6 @@ func (op *ConsolidateOperation) Execute() error {
 		data,
 		uint256.NewInt(uint64(value.Int64())),
 		op.ExplorerUrl,
+		op.Airgapped,
 	)
 }

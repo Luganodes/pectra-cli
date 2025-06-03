@@ -21,7 +21,7 @@ func PrintUsage() {
 
 	// Basic usage
 	color.New(color.FgHiWhite, color.Bold).Println("\n📋 USAGE:")
-	color.New(color.FgWhite).Println("  pectra-cli <command> <config-file>")
+	color.New(color.FgWhite).Println("  pectra-cli [command] [options]")
 
 	// Commands
 	color.New(color.FgHiWhite, color.Bold).Println("\n🔧 COMMANDS:")
@@ -33,12 +33,26 @@ func PrintUsage() {
 	color.White("Execute partial or full exits for validators")
 	color.New(color.FgGreen).Print("  unset-code    ")
 	color.White("Unset code for the contract")
+	color.New(color.FgGreen).Print("  broadcast     ")
+	color.White("Broadcast a signed transaction")
+
+	// Global options
+	color.New(color.FgHiWhite, color.Bold).Println("\n🛠️  OPTIONS:")
+	color.New(color.FgYellow).Print("  -c, --config    ")
+	color.White("Path to configuration file (required for most commands)")
+	color.New(color.FgYellow).Print("  -f, --file      ")
+	color.White("Path to transaction file (required for broadcast command)")
+	color.New(color.FgYellow).Print("  -a, --airgapped ")
+	color.White("Run in airgapped mode")
+	color.New(color.FgYellow).Print("  -h, --help      ")
+	color.White("Show help for command")
 
 	// Examples
 	color.New(color.FgHiWhite, color.Bold).Println("\n📝 EXAMPLES:")
-	color.White("  pectra-cli switch config.json")
-	color.White("  pectra-cli consolidate config.json")
-	color.White("  pectra-cli el-exit config.json")
+	color.White("  pectra-cli switch --config config.json")
+	color.White("  pectra-cli consolidate -c config.json -a")
+	color.White("  pectra-cli el-exit --config config.json")
+	color.White("  pectra-cli broadcast --file signed_txn.json")
 
 	// Configuration details
 	color.New(color.FgHiWhite, color.Bold).Println("\n⚙️  CONFIGURATION FORMAT:")
@@ -76,6 +90,12 @@ func PrintUsage() {
         }
       }
     }
+  }`)
+
+	// Transaction file format
+	color.New(color.FgYellow).Println("\n  Transaction File Format (for broadcast command):")
+	color.White(`  {
+    "signedTransaction": "0x...hex encoded signed transaction data..."
   }`)
 
 	// Notes
