@@ -16,7 +16,7 @@ import (
 type ELExitOperation struct {
 	BaseOperation
 	Validators         map[string]config.ELExitDetails
-	AmountPerValidator int64
+	AmountPerValidator *big.Int
 }
 
 // Execute performs the batch EL exit operation
@@ -40,9 +40,9 @@ func (op *ELExitOperation) Execute() error {
 
 	// Use provided amount or default to 1
 	amountPerValidator := op.AmountPerValidator
-	if amountPerValidator <= 0 {
+	if amountPerValidator == nil {
 		color.Yellow("Amount per validator is not set, using default value of 1")
-		amountPerValidator = 1
+		amountPerValidator = big.NewInt(1)
 	}
 
 	// Create a slice of ExitData structs to match the contract's expected input
@@ -84,7 +84,7 @@ func (op *ELExitOperation) Execute() error {
 	}
 
 	value := new(big.Int)
-	value.Mul(big.NewInt(int64(len(exitData))), big.NewInt(amountPerValidator))
+	value.Mul(big.NewInt(int64(len(exitData))), amountPerValidator)
 	color.Cyan("Sending transaction with value: %v (for %d validators at %d each)",
 		value, len(exitData), amountPerValidator)
 

@@ -15,7 +15,7 @@ import (
 type SwitchOperation struct {
 	BaseOperation
 	Validators         []string
-	AmountPerValidator int64
+	AmountPerValidator *big.Int
 }
 
 // Execute performs the batch switch operation
@@ -37,9 +37,9 @@ func (op *SwitchOperation) Execute() error {
 
 	// Use provided amount or default to 1
 	amountPerValidator := op.AmountPerValidator
-	if amountPerValidator <= 0 {
+	if amountPerValidator == nil {
 		color.Yellow("Amount per validator is not set, using default value of 1")
-		amountPerValidator = 1
+		amountPerValidator = big.NewInt(1)
 	}
 
 	pubkeys := [][]byte{}
@@ -53,7 +53,7 @@ func (op *SwitchOperation) Execute() error {
 	}
 
 	value := new(big.Int)
-	value.Mul(big.NewInt(int64(len(op.Validators))), big.NewInt(amountPerValidator))
+	value.Mul(big.NewInt(int64(len(op.Validators))), amountPerValidator)
 	color.Cyan("Sending transaction with value: %v (for %d validators at %d each)",
 		value, len(op.Validators), amountPerValidator)
 

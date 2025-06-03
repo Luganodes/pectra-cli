@@ -4,6 +4,7 @@ import (
 	"crypto/ecdsa"
 	"fmt"
 	"log"
+	"math/big"
 	"os"
 
 	"github.com/Luganodes/Pectra-CLI/internal/config"
@@ -231,7 +232,7 @@ func runCommand(command, configPath string, airgapped bool) error {
 		op = &operations.SwitchOperation{
 			BaseOperation:      baseOp,
 			Validators:         cfg.Switch.Validators,
-			AmountPerValidator: feeAmount,
+			AmountPerValidator: big.NewInt(feeAmount),
 		}
 
 	case "consolidate":
@@ -245,7 +246,7 @@ func runCommand(command, configPath string, airgapped bool) error {
 			BaseOperation:      baseOp,
 			SourceValidators:   cfg.Consolidate.SourceValidators,
 			TargetValidator:    cfg.Consolidate.TargetValidator,
-			AmountPerValidator: feeAmount,
+			AmountPerValidator: big.NewInt(feeAmount),
 		}
 
 	case "el-exit":
@@ -258,7 +259,7 @@ func runCommand(command, configPath string, airgapped bool) error {
 		op = &operations.ELExitOperation{
 			BaseOperation:      baseOp,
 			Validators:         cfg.ELExit.Validators,
-			AmountPerValidator: feeAmount,
+			AmountPerValidator: big.NewInt(feeAmount),
 		}
 
 	case "unset-code":
