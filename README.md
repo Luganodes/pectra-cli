@@ -115,7 +115,7 @@ The CLI requires the Pectra batch contract's ABI. Place the `abi.json` file in t
 To unset delegation for a validator, run:
 
 ```bash
-./pectra-cli unset-delegation -c config.json
+./pectra-cli unset-code -c config.json
 ```
 
 ## Usage
