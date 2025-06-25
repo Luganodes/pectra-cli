@@ -101,7 +101,7 @@ func main() {
 			{
 				Name:        "unset-code",
 				Usage:       "Unset code for the contract",
-				Description: "Remove the contract code (for emergency situations only)",
+				Description: "Revoke the contract code functionality from the EOA",
 				Flags: []cli.Flag{
 					&cli.StringFlag{
 						Name:     "config",
