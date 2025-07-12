@@ -4,7 +4,7 @@
 
 A powerful airgapped CLI tool for executing Ethereum validator operations including consolidation, switching, and both partial and full withdrawals with seamless batching enabled by EIP-7702.
 
-# Background
+## Background
 
 The Pectra upgrade (Prague + Electra) introduces key validator enhancements: consolidation allows merging multiple validators into one to simplify management and reduce overhead; switch enables validators to update their BLS keys, supporting strategies like autocompounding without needing to exit and re-enter; and execution layer exits allow validators to exit directly via the execution layer, streamlining the exit process and enabling better integration with smart contracts and tooling.
 
@@ -28,15 +28,19 @@ Moreover, the CLI is designed to be airgapped, ensuring security by allowing use
 
 ## Installation
 
-1.  Ensure you have Go (version 1.21+ recommended, as per `.github/workflows/release.yml` line 18) installed on your system.
-2.  Clone the repository (if you haven't already).
-3.  Build the CLI tool:
+1. Ensure you have Go (version 1.21+ recommended, as per .github/workflows/release.yml line 18) installed on your system.
+2. Clone the repository (if you haven't already).
+3. Build the CLI tool and mnemonic signer:
 
     ```bash
+    # Build main CLI
     go build -o pectra-cli ./cmd/main.go
+    
+    # Build mnemonic signer
+    go build -o sign-mnemonic scripts/sign_mnemonic.go
     ```
-
-    This will create an executable file named `pectra-cli` in the current directory.
+    
+    This will create two executables: pectra-cli and sign-mnemonic in the current directory.
 
 ## Deployed Contracts
 - Mainnet - [0x17c11FDdADac2b341F2455aFe988fec4c3ba26e3](https://etherscan.io/address/0x17c11FDdADac2b341F2455aFe988fec4c3ba26e3)
@@ -44,9 +48,9 @@ Moreover, the CLI is designed to be airgapped, ensuring security by allowing use
 
 ## Configuration
 
-Create a JSON configuration file named `config.json` in the same directory as the `pectra-cli` executable. You can use `sample_config.json` as a template.
+Create a JSON configuration file named config.json in the same directory as the pectra-cli executable. You can use sample_config.json as a template.
 
-**Example `config.json`:**
+**Example config.json:**
 
 ```json
 {
@@ -98,17 +102,52 @@ Create a JSON configuration file named `config.json` in the same directory as th
 
 ## Private Key Handling
 
-Use the `--airgapped` or `-a` to run the CLI in airgapped mode; alternatively, omit the flag to sign directly in the CLI by providing the private key. The CLI will securely prompt you to enter it at runtime when an operation is initiated.
-(See `internal/config/config.go` lines 88-114)
+The CLI supports multiple secure signing methods:
 
-⚠️ Ensure that correct private keys are provided for the validators — otherwise, transactions will succeed but no validator operation will occur, wasting gas. <br><br>
+### 1. Airgapped Mode (Recommended)
+Use the `--airgapped` or `-a` flag to generate unsigned transactions that can be signed later:
+
+```bash
+./pectra-cli switch -c config.json -a
+```
+
+This creates an `unsigned_txn.json` file that can be signed using either:
+
+#### A) Private Key Signing
+```bash
+go run scripts/sign.go unsigned_txn.json
+```
+
+#### B) Mnemonic Phrase Signing
+```bash
+./sign-mnemonic unsigned_txn.json
+```
+
+The mnemonic signer will prompt for:
+- Your BIP-39 seed phrase (12, 15, 18, 21, or 24 words)
+- Derivation path (default: m/44'/60'/0'/0/0)
+
+Supported derivation paths:
+- Standard Ethereum: m/44'/60'/0'/0/0 (default)
+- Ledger Live: m/44'/60'/0'/0/0
+- MEW/MyCrypto: m/44'/60'/0'/0
+- Custom accounts: m/44'/60'/0'/0/[index]
+
+### 2. Direct Signing
+For convenience, you can sign directly by providing the private key when prompted (not recommended for production use):
+
+```bash
+./pectra-cli switch -c config.json
+```
+
+⚠ Ensure that correct private keys are provided for the validators — otherwise, transactions will succeed but no validator operation will occur, wasting gas. <br><br>
 
 ## 📜 ABI Dependency
 
-The CLI requires the Pectra batch contract's ABI. Place the `abi.json` file in the same directory as the `pectra-cli` executable.
+The CLI requires the Pectra batch contract's ABI. Place the abi.json file in the same directory as the pectra-cli executable.
 (The ABI is loaded from `./abi.json` as seen in `cmd/main.go` line 49) <br><br>
 
-## ⚠️ Unset Delegation
+## ⚠ Unset Delegation
 
 > It is HIGHLY recommended to unset delegation after performing any operation. This helps with restoration of EOA functionality and prevents the address from being used as a smart contract.
 
@@ -132,49 +171,55 @@ To get a gist of the CLI, run:
 ./pectra-cli --help
 ```
 
-Replace `<command>` with one of the operations listed below and `config.json` with the path to your configuration file.
+Replace <command> with one of the operations listed below and config.json with the path to your configuration file.
 
 Add the `-a` or `--airgapped` flag to run the CLI in airgapped mode.
 
 ### Switch Validators
 
-Updates deposit credentials for the validators specified in `config.json` under the `switch` section. You can switch up to 200 validators in a single batch.
+Updates deposit credentials for the validators specified in config.json under the switch section. You can switch up to 200 validators in a single batch.
 
 ```bash
 ./pectra-cli switch -c config.json
 ```
 
-⚠️ Do not switch a validator that has already been switched — the transaction will succeed but the switch won't take effect, wasting gas. <br><br>
+⚠ Do not switch a validator that has already been switched — the transaction will succeed but the switch won't take effect, wasting gas. <br><br>
 
 ### Consolidate Validators
 
-Consolidates funds from `sourceValidators` to `targetValidator` as specified in `config.json` under the `consolidate` section. You can consolidate from up to 63 source validators into one target validator.
+Consolidates funds from sourceValidators to targetValidator as specified in config.json under the consolidate section. You can consolidate from up to 63 source validators into one target validator.
 
 ```bash
 ./pectra-cli consolidate -c config.json
 ```
 
-⚠️ Do not use exited validators as source or target — transactions will succeed but consolidation won't occur, wasting gas.<br><br>
+⚠ Do not use exited validators as source or target — transactions will succeed but consolidation won't occur, wasting gas.<br><br>
 
 ### Execution Layer (EL) Exit
 
-Performs partial or full exits for validators specified in `config.json` under the `elExit` section. You can exit up to 200 validators in a single batch.
+Performs partial or full exits for validators specified in config.json under the elExit section. You can exit up to 200 validators in a single batch.
 
 ```bash
 ./pectra-cli el-exit -c config.json
 ```
 
-⚠️ Do not attempt to exit a validator that has already exited — the transaction will succeed but no exit will occur, wasting gas. <br><br>
+⚠ Do not attempt to exit a validator that has already exited — the transaction will succeed but no exit will occur, wasting gas. <br><br>
 
 ### Signing and Broadcast for airgapped mode
 
-To sign an unsigned transaction, use `scripts/sign.go` on the `unsigned_txn.json` file — this will generate a `signed_txn.json`. 
+After generating an unsigned transaction in airgapped mode, you have two signing options:
 
+#### Option 1: Sign with Private Key
 ```bash
 go run scripts/sign.go unsigned_txn.json
 ```
-Once signed, use the CLI's broadcast command to submit the `signed_txn.json` to the network.
 
+#### Option 2: Sign with Mnemonic Phrase
+```bash
+./sign-mnemonic unsigned_txn.json
+```
+
+Both methods will generate a signed_txn.json file. Broadcast it using:
 
 ```bash
 ./pectra-cli broadcast -c config.json -f signed_txn.json
@@ -183,31 +228,36 @@ Once signed, use the CLI's broadcast command to submit the `signed_txn.json` to 
 ## 📝 Important Notes
 
 - **Validator Public Keys**: All validator public keys in the `config.json` file must be in hexadecimal format, without the "0x" prefix.
-- **Transaction Fees**: The fee required per validator for each operation (switch, consolidate, EL exit) is automatically fetched from the smart contract functions (`getConsolidationFee`, `getExitFee`). This fee is in Wei. The total transaction `value` sent will be `(number of validators) * (fee per validator)`.
+- **Transaction Fees**: The fee required per validator for each operation (switch, consolidate, EL exit) is automatically fetched from the smart contract functions (`getConsolidationFee`, `getExitFee`). This fee is in Wei. The total transaction value sent will be `(number of validators) * (fee per validator)`.
   (Fee fetching logic: `cmd/main.go` lines 67-74, 78-79, 91-92, 105-106) and `internal/utils/utils.go` lines 98-125
 - **Execution Layer (EL) Exits**:
-  - The `amount` specified in the `elExit.validators` section of `config.json` is in **Gwei** (1 ETH = 1,000,000,000 Gwei).
+  - The amount specified in the `elExit.validators` section of `config.json` is in **Gwei** (1 ETH = 1,000,000,000 Gwei).
     (See `internal/utils/utils.go` for usage notes, and `internal/operations/partialexit.go` lines 41-49 for handling)
-  - For a **full exit**, set `amount` to `0` (or `0.0`) and `confirmFullExit` to `true`.
-  - For a **partial exit**, specify the desired `amount` in Gwei (e.g., `10.0` for 10 Gwei) and ensure `confirmFullExit` is `false`.
+  - For a **full exit**, set amount to `0` (or `0.0`) and `confirmFullExit` to `true`.
+  - For a **partial exit**, specify the desired amount in Gwei (e.g., `10.0` for 10 Gwei) and ensure `confirmFullExit` is `false`.
 - **Transaction Authorization**: This tool utilizes EIP-7702 SetCode transaction authorization for its operations.
   (See `internal/transaction/transaction.go` lines 18-61)
+- **Mnemonic Security**: When using the mnemonic signer:
+  - Never share your seed phrase
+  - Run the signer on an airgapped machine when possible
+  - Verify the derived address matches your expected wallet address
+  - Consider using a dedicated account for validator operations
 
 <br>
+
 
 ## Sample Output
 
 (The CLI provides informative output during its execution, including connection status, fees, transaction hashes, and success/failure messages.)
 ### Sample Output for airgapped mode
-![Sample Airgapped Output](https://i.imgur.com/CfKpNsN.png)
-<br>
-![Sample Signing Output](https://i.imgur.com/M9GGQB0.png)
-<br>
+![Sample Airgapped Output](https://i.postimg.cc/nhVbfmWV/Screenshot-2025-07-12-205709.png)
+![Sample Private key Signing Output](https://i.postimg.cc/yYcY80nF/Screenshot-2025-07-12-205643.png)
+![Sample Mnemonic phrase Signing Output](https://i.postimg.cc/XqtBF3yX/Screenshot-2025-07-12-210006.png)
 ![Sample Broadcast Output](https://i.imgur.com/nIEZDl8.png)
 <br>
 ### Sample Output for non-airgapped mode
 ![Sample Non Airgapped Output](https://i.imgur.com/L2wpleY.png)
-_(Note: The sample output images might show older field names or values; refer to the current configuration guidelines.)_
+(Note: The sample output images might show older field names or values; refer to the current configuration guidelines.)
 
 <br>
 
