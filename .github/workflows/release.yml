@@ -34,21 +34,30 @@ jobs:
           fi
           go build -o $PECTRA_BINARY_NAME cmd/main.go
 
-          # Build signer
+          # Build private key signer
           SIGNER_BINARY_NAME="signer"
           if [ "${{ matrix.goos }}" = "windows" ]; then
             SIGNER_BINARY_NAME="${SIGNER_BINARY_NAME}.exe"
           fi
           go build -o $SIGNER_BINARY_NAME scripts/sign.go
 
+          # Build mnemonic signer
+          MNEMONIC_SIGNER_BINARY_NAME="sign-mnemonic"
+          if [ "${{ matrix.goos }}" = "windows" ]; then
+            MNEMONIC_SIGNER_BINARY_NAME="${MNEMONIC_SIGNER_BINARY_NAME}.exe"
+          fi
+          go build -o $MNEMONIC_SIGNER_BINARY_NAME scripts/sign_mnemonic.go
+
           # Create dist directory and move binaries
           mkdir -p dist
           if [ "${{ matrix.goos }}" = "windows" ]; then
             mv $PECTRA_BINARY_NAME "dist/pectra-cli-${{ matrix.goos }}-${{ matrix.goarch }}.exe"
             mv $SIGNER_BINARY_NAME "dist/signer-${{ matrix.goos }}-${{ matrix.goarch }}.exe"
+            mv $MNEMONIC_SIGNER_BINARY_NAME "dist/sign-mnemonic-${{ matrix.goos }}-${{ matrix.goarch }}.exe"
           else
             mv $PECTRA_BINARY_NAME "dist/pectra-cli-${{ matrix.goos }}-${{ matrix.goarch }}"
             mv $SIGNER_BINARY_NAME "dist/signer-${{ matrix.goos }}-${{ matrix.goarch }}"
+            mv $MNEMONIC_SIGNER_BINARY_NAME "dist/sign-mnemonic-${{ matrix.goos }}-${{ matrix.goarch }}"
           fi
 
       - name: Create Release
